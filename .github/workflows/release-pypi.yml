@@ -21,7 +21,7 @@ jobs:
     steps:
 
     - name: Checkout sources
-      uses: actions/checkout@v5
+      uses: actions/checkout@v6
       with:
         # Include all history to get tags for versioning
         fetch-depth: 0
