@@ -121,24 +121,11 @@ def lhs(n, samples=None, criterion=None, iterations=None):
 ################################################################################
 
 def _lhsclassic(n, samples):
-    # Generate the intervals
-    cut = np.linspace(0, 1, samples + 1)    
-    
-    # Fill points uniformly in each interval
-    u = np.random.rand(samples, n)
-    a = cut[:samples]
-    b = cut[1:samples + 1]
-    rdpoints = np.zeros_like(u)
+    cut = linspace(0, 1, samples + 1)
+    u = random.rand(samples, n)
     for j in range(n):
-        rdpoints[:, j] = u[:, j]*(b-a) + a
-    
-    # Make the random pairings
-    H = np.zeros_like(rdpoints)
-    for j in range(n):
-        order = np.random.permutation(range(samples))
-        H[:, j] = rdpoints[order, j]
-    
-    return H
+        u[random.permutation(arange(samples)), j] = u[:, j] * cut[1] + cut[:samples]
+    return u
     
 ################################################################################
 
