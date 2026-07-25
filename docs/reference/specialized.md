@@ -6,23 +6,46 @@ In this section, the following specialized designs are described:
 !!! note
     All available designs can be accessed after a simple import statement:
     ```pycon
+    >>> import numpy as np
     >>> from pydoe import definitive_screening_design, supersaturated_design
     ```
 
 ## Definitive Screening Design (`definitive_screening_design`) {#definitive-screening-design-definitive_screening_design}
 
 A **definitive screening design** (Jones & Nachtsheim, 2011) is a
-three-level design for *k* factors requiring only $2k + 1$ runs that
-estimates all main effects independent of two-factor interactions and
-of each other, estimates all quadratic effects, and keeps two-factor
-interactions clear of main effects.
+three-level design for continuous factors that estimates all main
+effects independently of two-factor interactions and can detect
+curvature. The Jones & Nachtsheim (2013) extension adds two-level
+categorical factors.
 
 ```pycon
->>> definitive_screening_design(k)  # (1)!
+>>> definitive_screening_design(
+...     k,
+...     n_cat=0,
+...     *,
+...     method="dsd",
+...     min_13=False,
+...     n_fake_factors=0,
+... )
 ```
 
-1. `k` — number of factors. `k - 1` must be an odd prime (e.g. `k` =
-   4, 6, 8, 12, 14, 18, 20, 24, ...).
+- `k` is the number of continuous factors. It may be zero when
+  `n_cat` is positive.
+- `n_cat` is the number of two-level categorical factors.
+- `method="dsd"` de-aliases two-factor interactions involving
+  categorical factors. `method="orth"` instead produces an orthogonal
+  main-effects plan.
+- `min_13=True` augments a small design with enough temporary factors
+  to provide at least 13 runs.
+- `n_fake_factors` manually adds temporary continuous factors to
+  increase the number of runs. Their columns are not returned.
+
+Continuous-factor columns precede categorical-factor columns. Continuous
+levels are coded as `-1`, `0`, and `1`, while categorical levels use
+PyDOE's conventional two-level coding, `-1` and `1`. The function always
+returns a floating-point NumPy array.
+
+The historical one-argument result and row order are unchanged:
 
 ```pycon
 >>> definitive_screening_design(4)
@@ -38,9 +61,45 @@ array([[ 0.,  0.,  0.,  0.],
 ```
 
 !!! note
-    The design is built from a Paley conference matrix $C$ of order $k$
-    as $D = [0; C; -C]$, stacking the all-zero center run on top of $C$
-    and its fold-over $-C$.
+    When a Paley conference matrix exists at the requested size, the
+    design is $D = [0; C; -C]$. Other factor counts use the next suitable
+    conference matrix and retain only the requested columns. Efficient
+    special constructions are used around 10, 16, and 26 factors.
+
+Mixed continuous and categorical designs are generated directly:
+
+```pycon
+>>> design = definitive_screening_design(3, n_cat=2)
+>>> design.shape
+(14, 5)
+>>> np.unique(design[:, :3])
+array([-1.,  0.,  1.])
+>>> np.unique(design[:, 3:])
+array([-1.,  1.])
+```
+
+The orthogonal method adds the center runs needed to make all main-effect
+columns orthogonal:
+
+```pycon
+>>> orthogonal = definitive_screening_design(3, n_cat=2, method="orth")
+>>> orthogonal.shape
+(16, 5)
+>>> gram = orthogonal.T @ orthogonal
+>>> np.allclose(gram - np.diag(np.diag(gram)), 0)
+True
+```
+
+Small designs can be enlarged without exposing the temporary columns:
+
+```pycon
+>>> definitive_screening_design(4).shape
+(9, 4)
+>>> definitive_screening_design(4, min_13=True).shape
+(13, 4)
+>>> definitive_screening_design(4, n_fake_factors=2).shape
+(13, 4)
+```
 
 ## Supersaturated Design (`supersaturated_design`) {#supersaturated-design-supersaturated_design}
 
@@ -83,6 +142,9 @@ For further reading, see:
 - Xiao, L., Lin, D. K. J., & Bai, F. (2012). Constructing definitive
   screening designs using conference matrices. *Journal of Quality
   Technology*, 44(1), 2-8.
+- Jones, B., & Nachtsheim, C. J. (2013). Definitive screening designs
+  with added two-level categorical factors. *Journal of Quality
+  Technology*, 45(2), 121-129.
 - Lin, D. K. J. (1993). A new class of supersaturated designs.
   *Technometrics*, 35(1), 28-31.
 - [NIST Handbook Section 5.3.3.4 — Supersaturated Designs](https://www.itl.nist.gov/div898/handbook/pri/section3/pri334.htm)
