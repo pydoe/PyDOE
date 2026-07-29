@@ -28,7 +28,7 @@ from pydoe import (
 )
 
 
-class TestOptimalDesign(unittest.TestCase):  # ruff: ignore[too-many-public-methods]
+class TestOptimalDesign(unittest.TestCase):
     def setUp(self):
         np.random.seed(42)
         self.candidates_2d = generate_candidate_set(

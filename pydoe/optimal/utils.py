@@ -46,7 +46,7 @@ def _xtx_augmented(
     if alpha and X0 is not None and len(X0) > 0:
         N0 = X0.shape[0]
         H0 = (X0.T @ X0) / N0
-        H = H + alpha * H0  # ruff: ignore[non-augmented-assignment]
+        H = H + alpha * H0
     return H
 
 

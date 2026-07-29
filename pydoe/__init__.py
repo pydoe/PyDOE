@@ -125,7 +125,7 @@ from .taguchi import (
 from .utils import iman_conover, scale_samples, var_regression_matrix
 
 
-try:  # ruff: ignore[non-empty-init-module]
+try:
     __version__ = version(__name__)
 except PackageNotFoundError:
     __version__ = "unknown"

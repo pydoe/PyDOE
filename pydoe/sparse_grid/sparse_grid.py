@@ -190,7 +190,7 @@ def _generate_sparse_grid_points(  # ruff: ignore[too-many-branches]
                 points.append(point)
 
     # Level 2+: structured interior points
-    if n_level >= 2:  # ruff: ignore[too-many-nested-blocks]
+    if n_level >= 2:
         grid_size = min(n_level + 2, 7)
         coords = np.linspace(0, 1, grid_size)
 

@@ -353,7 +353,7 @@ def modified_fedorov(  # ruff: ignore[too-many-arguments, too-many-positional-ar
     return design
 
 
-def detmax(  # ruff: ignore[too-many-arguments, too-many-locals, too-many-positional-arguments]
+def detmax(  # ruff: ignore[too-many-arguments, too-many-positional-arguments]
     candidates: np.ndarray,
     n_points: int,
     degree: int,

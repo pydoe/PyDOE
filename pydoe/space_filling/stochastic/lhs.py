@@ -316,7 +316,7 @@ def _lhscorrelate(
 ################################################################################
 
 
-def _lhsmu(  # ruff: ignore[too-many-locals]
+def _lhsmu(
     N: int,
     samples: int | None = None,
     corr: np.ndarray = None,
