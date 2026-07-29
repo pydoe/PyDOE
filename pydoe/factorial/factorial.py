@@ -560,7 +560,7 @@ def _n_fac_at_res(n: int, res: int) -> int:
 ################################################################################
 
 
-def fracfact_opt(  # noqa: PLR0914
+def fracfact_opt(
     n_factors: int, n_erased: int, max_attempts: int = 0
 ) -> tuple[str, list[str], np.ndarray]:
     """

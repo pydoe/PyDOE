@@ -28,7 +28,7 @@ from pydoe import (
 )
 
 
-class TestOptimalDesign(unittest.TestCase):  # noqa: PLR0904
+class TestOptimalDesign(unittest.TestCase):
     def setUp(self):
         np.random.seed(42)
         self.candidates_2d = generate_candidate_set(
@@ -837,7 +837,7 @@ class TestOptimalDesign(unittest.TestCase):  # noqa: PLR0904
                     max_iter=100,
                 )
 
-    def test_all_nine_criteria_comprehensive_with_regularization(self):  # noqa: PLR0912, PLR0915
+    def test_all_nine_criteria_comprehensive_with_regularization(self):  # ruff: ignore[too-many-branches, too-many-statements]
         criteria = ["D", "A", "I", "C", "E", "G", "V", "S", "T"]
         results = {}
 

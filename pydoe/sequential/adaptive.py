@@ -35,7 +35,7 @@ from pydoe.utils import scale_samples
 __all__ = ["sequential_design"]
 
 
-def sequential_design(  # noqa: PLR0913, PLR0914
+def sequential_design(  # ruff: ignore[too-many-arguments]
     objective: Callable[[np.ndarray], float],
     bounds: np.ndarray,
     n_initial: int,

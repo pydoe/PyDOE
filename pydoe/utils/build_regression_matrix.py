@@ -30,7 +30,7 @@ def grep(haystack: str, needle: str) -> Iterator[int]:
         start += len(needle)
 
 
-def build_regression_matrix(  # noqa: PLR0912
+def build_regression_matrix(  # ruff: ignore[too-many-branches]
     H: np.ndarray, model: str, build: np.ndarray[np.bool_] = None
 ) -> np.ndarray:
     """
@@ -105,11 +105,11 @@ def build_regression_matrix(  # noqa: PLR0912
     if vector_mode:
         R = np.zeros((len(list_of_tokens), 1))
         for j in range(len(list_of_tokens)):
-            R[j, 0] = eval(list_of_tokens[j])  # noqa: S307
+            R[j, 0] = eval(list_of_tokens[j])  # ruff: ignore[suspicious-eval-usage]
     else:
         R = np.zeros((H.shape[0], len(list_of_tokens)))
         for i in range(H.shape[0]):
             for j in range(len(list_of_tokens)):
-                R[i, j] = eval(list_of_tokens[j])  # noqa: S307
+                R[i, j] = eval(list_of_tokens[j])  # ruff: ignore[suspicious-eval-usage]
 
     return R

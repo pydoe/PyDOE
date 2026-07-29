@@ -45,7 +45,7 @@ $$X =
 1 & 1 & -1 & 1 & 1 & -1 \\
 1 & 1 & 1 & 1 & 1 & 1 \\
 \end{bmatrix}$$
-"""  # noqa: E501
+"""  # ruff: ignore[line-too-long]
 
 from __future__ import annotations
 
@@ -91,7 +91,7 @@ def build_design_matrix(candidates: np.ndarray, degree: int) -> np.ndarray:
 
     where $k$ is the number of factors, $x_i$ are the input variables, and $\beta$ are
     the model parameters.
-    """  # noqa: E501
+    """  # ruff: ignore[line-too-long]
     candidates = np.asarray(candidates, dtype=float)
     n_points, n_factors = candidates.shape
 

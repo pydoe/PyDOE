@@ -125,7 +125,7 @@ from .taguchi import (
 from .utils import iman_conover, scale_samples, var_regression_matrix
 
 
-try:  # noqa: RUF067
+try:
     __version__ = version(__name__)
 except PackageNotFoundError:
     __version__ = "unknown"

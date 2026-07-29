@@ -16,7 +16,7 @@ from pydoe.optimal.model import build_design_matrix, build_uniform_moment_matrix
 from pydoe.optimal.utils import criterion_value
 
 
-def optimal_design(  # noqa: PLR0913, PLR0917
+def optimal_design(  # ruff: ignore[too-many-arguments, too-many-positional-arguments]
     candidates: np.ndarray,
     n_points: int,
     degree: int,
