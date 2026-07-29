@@ -94,6 +94,7 @@ preview = true
 output-format = "grouped"
 
 [tool.ruff.lint]
+explicit-preview-rules = true
 isort.lines-after-imports = 2
 isort.split-on-trailing-comma = false
 
