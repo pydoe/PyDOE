@@ -26,7 +26,7 @@ from scipy import linalg, spatial, stats
 __all__ = ["lhs"]
 
 
-def lhs(  # noqa: PLR0912, PLR0913, PLR0917
+def lhs(  # ruff: ignore[too-many-branches, too-many-arguments, too-many-positional-arguments]
     n: int,
     samples: int | None = None,
     criterion: Literal[
@@ -316,7 +316,7 @@ def _lhscorrelate(
 ################################################################################
 
 
-def _lhsmu(  # noqa: PLR0914
+def _lhsmu(
     N: int,
     samples: int | None = None,
     corr: np.ndarray = None,
@@ -326,7 +326,7 @@ def _lhsmu(  # noqa: PLR0914
     if samples is None:
         samples = N
 
-    I = M * samples  # noqa: E741
+    I = M * samples  # ruff: ignore[ambiguous-variable-name]
 
     rdpoints = randomstate.uniform(size=(I, N))
 
@@ -370,7 +370,7 @@ def _lhsmu(  # noqa: PLR0914
         H = np.zeros_like(rdpoints, dtype=float)
         rank = np.argsort(rdpoints, axis=0)
 
-        for l in range(samples):  # noqa: E741
+        for l in range(samples):  # ruff: ignore[ambiguous-variable-name]
             low = float(l) / samples
             high = float(l + 1) / samples
 

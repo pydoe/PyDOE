@@ -29,7 +29,7 @@ from scipy.stats import qmc
 __all__ = ["sobol_sequence"]
 
 
-def sobol_sequence(  # noqa: PLR0913
+def sobol_sequence(  # ruff: ignore[too-many-arguments]
     n: int,
     d: int,
     *,

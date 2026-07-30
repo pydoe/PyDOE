@@ -118,7 +118,10 @@ Ruff enforces strict rules. Notable ones:
 - `PLR2004` — **ignored**: magic number comparisons allowed.
 - `S311` — **ignored**: non-cryptographic random usage allowed.
 
-Line length is 80. Functions that genuinely need many arguments carry `# noqa: PLR0913` (too many args) or `# noqa: PLR0912` (too many branches).
+Line length is 80. Do not use `# noqa` suppression comments. When a suppression
+is genuinely necessary, use Ruff's human-readable form, such as
+`# ruff: ignore[too-many-arguments]` or
+`# ruff: ignore[too-many-branches]`.
 
 ## Documentation
 

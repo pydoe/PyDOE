@@ -41,12 +41,12 @@ def _xtx_augmented(
     -------
     ndarray of shape (p, p)
         Augmented information matrix.
-    """  # noqa: E501
+    """  # ruff: ignore[line-too-long]
     H = X.T @ X
     if alpha and X0 is not None and len(X0) > 0:
         N0 = X0.shape[0]
         H0 = (X0.T @ X0) / N0
-        H = H + alpha * H0  # noqa: PLR6104
+        H = H + alpha * H0
     return H
 
 
@@ -76,13 +76,13 @@ def information_matrix(
     -------
     ndarray of shape (p, p)
         Information matrix.
-    """  # noqa: E501
+    """  # ruff: ignore[line-too-long]
     n = X.shape[0]
     H_aug = _xtx_augmented(X, alpha=alpha, X0=X0)
     return H_aug / n if normalized else H_aug
 
 
-def criterion_value(  # noqa: PLR0911
+def criterion_value(  # ruff: ignore[too-many-return-statements]
     X: np.ndarray,
     criterion: Literal["D", "A", "I", "C", "E", "G", "V", "S", "T"],
     X0: np.ndarray = None,
@@ -153,7 +153,7 @@ def criterion_value(  # noqa: PLR0911
         raise ValueError(f"Unknown criterion: {criterion}")
 
 
-def _best_single_add(  # noqa: PLR0913, PLR0917
+def _best_single_add(  # ruff: ignore[too-many-arguments, too-many-positional-arguments]
     current: np.ndarray,
     pool: np.ndarray,
     degree: int,
@@ -206,7 +206,7 @@ def _best_single_add(  # noqa: PLR0913, PLR0917
     return best_idx, best_val
 
 
-def _best_single_drop(  # noqa: PLR0913, PLR0917
+def _best_single_drop(  # ruff: ignore[too-many-arguments, too-many-positional-arguments]
     current: np.ndarray,
     degree: int,
     criterion: str,

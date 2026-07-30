@@ -94,6 +94,7 @@ preview = true
 output-format = "grouped"
 
 [tool.ruff.lint]
+explicit-preview-rules = true
 isort.lines-after-imports = 2
 isort.split-on-trailing-comma = false
 
@@ -120,22 +121,22 @@ select = [
 ]
 
 ignore = [
-    "N803",      # [pep8-naming](https://docs.astral.sh/ruff/rules/invalid-argument-name/)
-    "N806",      # [pep8-naming](https://docs.astral.sh/ruff/rules/non-lowercase-variable-in-function/)
-    "PLR2004",   # [pylint](https://docs.astral.sh/ruff/rules/magic-value-comparison/)
-    "S311",      # [flake8-bandit](https://docs.astral.sh/ruff/rules/suspicious-non-cryptographic-random-usage/)
+    "invalid-argument-name",      # [pep8-naming](https://docs.astral.sh/ruff/rules/invalid-argument-name/)
+    "non-lowercase-variable-in-function",      # [pep8-naming](https://docs.astral.sh/ruff/rules/non-lowercase-variable-in-function/)
+    "magic-value-comparison",   # [pylint](https://docs.astral.sh/ruff/rules/magic-value-comparison/)
+    "suspicious-non-cryptographic-random-usage",      # [flake8-bandit](https://docs.astral.sh/ruff/rules/suspicious-non-cryptographic-random-usage/)
 ]
 
 [tool.ruff.lint.per-file-ignores]
 "tests/*.py" = [
-    "ANN001",     # [flake8-annotations](https://docs.astral.sh/ruff/rules/missing-type-function-argument/)
-    "ANN201",     # [flake8-annotations](https://docs.astral.sh/ruff/rules/missing-return-type-undocumented-public-function/)
-    "ANN202",     # [flake8-annotations](https://docs.astral.sh/ruff/rules/missing-return-type-private-function/)
-    "S101",       # [flake8-bandit](https://docs.astral.sh/ruff/rules/assert/)
-    "N802",       # [pep8-naming](https://docs.astral.sh/ruff/rules/invalid-function-name/)
-    "N803",       # [pep8-naming](https://docs.astral.sh/ruff/rules/invalid-argument-name/)
-    "N806",       # [pep8-naming](https://docs.astral.sh/ruff/rules/non-lowercase-variable-in-function/)
-    "PLR6301",    # [pylint](https://docs.astral.sh/ruff/rules/no-self-use/)
+    "missing-type-function-argument",     # [flake8-annotations](https://docs.astral.sh/ruff/rules/missing-type-function-argument/)
+    "missing-return-type-undocumented-public-function",     # [flake8-annotations](https://docs.astral.sh/ruff/rules/missing-return-type-undocumented-public-function/)
+    "missing-return-type-private-function",     # [flake8-annotations](https://docs.astral.sh/ruff/rules/missing-return-type-private-function/)
+    "assert",       # [flake8-bandit](https://docs.astral.sh/ruff/rules/assert/)
+    "invalid-function-name",       # [pep8-naming](https://docs.astral.sh/ruff/rules/invalid-function-name/)
+    "invalid-argument-name",       # [pep8-naming](https://docs.astral.sh/ruff/rules/invalid-argument-name/)
+    "non-lowercase-variable-in-function",       # [pep8-naming](https://docs.astral.sh/ruff/rules/non-lowercase-variable-in-function/)
+    "no-self-use",    # [pylint](https://docs.astral.sh/ruff/rules/no-self-use/)
 ]
 
 [tool.ruff.format]

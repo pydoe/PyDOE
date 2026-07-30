@@ -48,7 +48,7 @@ from pydoe.space_filling.quasi_random.sobol import sobol_sequence
 __all__ = ["saltelli_sampling"]
 
 
-def saltelli_sampling(  # noqa: PLR0913
+def saltelli_sampling(  # ruff: ignore[too-many-arguments]
     num_vars: int,
     N: int,
     *,
