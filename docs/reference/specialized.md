@@ -18,6 +18,14 @@ effects independently of two-factor interactions and can detect
 curvature. The Jones & Nachtsheim (2013) extension adds two-level
 categorical factors.
 
+!!! info "Credits"
+    The generalized construction is adapted from
+    [`definitive_screening_design` 0.5.0](https://github.com/danieleongari/definitive_screening_design/tree/v0.5.0).
+    Jacob Albrecht of Bristol-Myers Squibb ported the construction from
+    JMP to MATLAB in 2015, and Daniele Ongari ported it to Python in
+    2022. The adapted source is distributed under the BSD 3-Clause
+    License.
+
 ```pycon
 >>> definitive_screening_design(
 ...     k,

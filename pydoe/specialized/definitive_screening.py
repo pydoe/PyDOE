@@ -1,4 +1,7 @@
 """
+Copyright (C) 2015 - Jacob Albrecht, Bristol-Myers Squibb
+Copyright (C) 2022 - Daniele Ongari
+
 Definitive screening designs (DSD).
 
 A definitive screening design (Jones & Nachtsheim, 2011) is a
@@ -7,10 +10,9 @@ independently of two-factor interactions and can detect curvature. The
 Jones & Nachtsheim (2013) extension adds two-level categorical factors.
 
 The generalized construction in this module is adapted from
-``danieleongari/definitive_screening_design`` 0.5.0:
-
-- Copyright (c) 2015, Jacob Albrecht, Bristol-Myers Squibb
-- Copyright (c) 2022, Daniele Ongari
+``danieleongari/definitive_screening_design`` 0.5.0. Jacob Albrecht
+originally ported it from JMP to MATLAB, and Daniele Ongari subsequently
+ported it to Python.
 
 The adapted source is distributed under the BSD 3-Clause License.
 
@@ -92,6 +94,28 @@ def definitive_screening_design(
         If a factor count is not a nonnegative integer, no real factors
         are requested, ``method`` is invalid, or ``min_13`` is not a
         boolean.
+
+    Notes
+    -----
+    The generalized construction is adapted from version 0.5.0 of
+    ``danieleongari/definitive_screening_design`` [4]_. Jacob Albrecht
+    originally ported it from JMP to MATLAB in 2015, and Daniele Ongari
+    subsequently ported it to Python in 2022. The adapted source is
+    distributed under the BSD 3-Clause License.
+
+    References
+    ----------
+    .. [1] Jones, B., & Nachtsheim, C. J. (2011). A class of three-level
+       designs for definitive screening in the presence of second-order
+       effects. *Journal of Quality Technology*, 43(1), 1-15.
+    .. [2] Xiao, L., Lin, D. K. J., & Bai, F. (2012). Constructing
+       definitive screening designs using conference matrices. *Journal
+       of Quality Technology*, 44(1), 2-8.
+    .. [3] Jones, B., & Nachtsheim, C. J. (2013). Definitive screening
+       designs with added two-level categorical factors. *Journal of
+       Quality Technology*, 45(2), 121-129.
+    .. [4] Ongari, D. (2022). ``definitive_screening_design`` 0.5.0.
+       https://github.com/danieleongari/definitive_screening_design/tree/v0.5.0
 
     Examples
     --------
