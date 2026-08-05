@@ -4,7 +4,25 @@ All notable changes to PyDOE are documented here.
 
 ---
 
-## [**Latest**](https://github.com/pydoe/pydoe/releases/latest)
+## [**Latest**](https://github.com/pydoe/pydoe/compare/v1.3.0...master)
+
+### :material-refresh: Changed
+- Generalize `definitive_screening_design` with arbitrary continuous-factor counts, two-level categorical factors, orthogonal and interaction-de-aliased methods, minimum-run augmentation, and fake factors while preserving historical one-argument results ([#145](https://github.com/pydoe/pydoe/pull/145)) — [@danieleongari](https://github.com/danieleongari)
+
+---
+
+## [**v1.3.0**](https://github.com/pydoe/pydoe/releases/tag/v1.3.0) <small>2026-06-10</small>
+
+### :material-plus-circle: Added
+- Maximum projection design (`maxpro_design`) — optimizes Latin hypercube projections through coordinate-exchange search — [@saudzahirr](https://github.com/saudzahirr)
+- Nearly orthogonal Latin hypercube (`nearly_orthogonal_lhs`) — minimizes correlation while retaining Latin hypercube stratification — [@saudzahirr](https://github.com/saudzahirr)
+- Maximin and minimax distance designs (`maximin_design`, `minimax_design`) — spread points by optimizing pairwise or covering distances — [@saudzahirr](https://github.com/saudzahirr)
+- Faure and Niederreiter low-discrepancy sequences (`faure_sequence`, `niederreiter_sequence`) — deterministic space-filling sequences for quasi-Monte Carlo sampling — [@saudzahirr](https://github.com/saudzahirr)
+- Sequential Bayesian-optimization designs (`sequential_design`) with Gaussian-process regression and expected-improvement, probability-improvement, and upper-confidence-bound acquisition functions — [@saudzahirr](https://github.com/saudzahirr)
+
+---
+
+## [**v1.2.0**](https://github.com/pydoe/pydoe/releases/tag/v1.2.0) <small>2026-06-10</small>
 
 ### :material-plus-circle: Added
 - Latin square (`latin_square`), Graeco-Latin square (`graeco_latin_square`), and hyper-Graeco-Latin square (`hyper_graeco_latin_square`) designs — remove the effect of two, three, or more nuisance factors using mutually orthogonal Latin squares — [@saudzahirr](https://github.com/saudzahirr)
@@ -16,8 +34,9 @@ All notable changes to PyDOE are documented here.
 - Blocking of full factorial designs (`block_full_factorial`) — splits a $2^k$ factorial into $2^p$ blocks by confounding chosen interactions with block effects — [@saudzahirr](https://github.com/saudzahirr)
 - Orthogonally-blocked central composite design (`block_ccdesign`) — splits a CCD into a factorial block and an axial block with `alpha` chosen for orthogonal blocking — [@saudzahirr](https://github.com/saudzahirr)
 - Hartley's small composite design (`small_composite_design`) — augments a resolution-III fractional factorial with star points, requiring fewer runs than a standard CCD — [@saudzahirr](https://github.com/saudzahirr)
-- Definitive screening design (`definitive_screening_design`) — generalized Jones-Nachtsheim construction with arbitrary continuous-factor counts, two-level categorical factors, orthogonal and interaction-de-aliased methods, minimum-run augmentation, and fake factors; historical one-argument results remain unchanged — [@saudzahirr](https://github.com/saudzahirr), [@danieleongari](https://github.com/danieleongari)
+- Definitive screening design (`definitive_screening_design`) — three-level Jones-Nachtsheim design requiring only $2k+1$ runs, built from a Paley conference matrix and its fold-over — [@saudzahirr](https://github.com/saudzahirr)
 - Supersaturated design (`supersaturated_design`) — random-search construction of $k > n$ two-level designs minimizing $E(s^2)$ for screening under effect sparsity — [@saudzahirr](https://github.com/saudzahirr)
+- Nested Latin hypercube (`nested_lhs`) — constructs nested designs for multi-fidelity experiments — [@saudzahirr](https://github.com/saudzahirr)
 - Orthogonal array-based Latin hypercube design (`oa_lhd`) — Tang's (1993) construction turning a symmetric orthogonal array into a Latin hypercube with improved two-dimensional uniformity — [@saudzahirr](https://github.com/saudzahirr)
 - Sliced Latin hypercube design (`sliced_lhs`) — partitions an $N=mt$-point Latin hypercube into $t$ slices of $m$ points, each a Latin hypercube in its own right — [@saudzahirr](https://github.com/saudzahirr)
 

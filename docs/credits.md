@@ -50,16 +50,4 @@ long-standing bugs, and continued active development.
 > Source:  
 <a href="https://github.com/relf/pyDOE3" style="color: #484848;">github.com/relf/pydoe3</a>
 
-## Definitive Screening Design
-
-The generalized definitive-screening construction, including support for
-two-level categorical factors, was ported from JMP to MATLAB by Jacob
-Albrecht and subsequently to Python by Daniele Ongari:
-
-- Copyright (c) 2015, Jacob Albrecht, Bristol-Myers Squibb
-- Copyright (c) 2022, Daniele Ongari
-
-> Source:
-<a href="https://github.com/danieleongari/definitive_screening_design" style="color: #484848;">github.com/danieleongari/definitive_screening_design</a>
-
 > All previous versions and forks, including PyDOE2 and PyDOE3, have now been consolidated under a single active repository: <a href="https://github.com/pydoe/pydoe" style="color: #484848;">github.com/pydoe/pydoe</a>
