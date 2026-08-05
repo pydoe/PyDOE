@@ -1,3 +1,4 @@
+import itertools
 import unittest
 
 import numpy as np
@@ -44,6 +45,21 @@ class TestDefinitiveScreeningDesign(unittest.TestCase):
         k = 4
         design = definitive_screening_design(k)
         np.testing.assert_allclose(design[1 : k + 1], -design[k + 1 :])
+
+    def test_continuous_designs_have_defining_properties(self):
+        for k in range(4, 18):
+            with self.subTest(k=k):
+                design = definitive_screening_design(k)
+                rows = {tuple(row) for row in design}
+                self.assertTrue(all(tuple(-row) in rows for row in design))
+
+                np.testing.assert_allclose(design.sum(axis=0), 0)
+                gram = design.T @ design
+                np.testing.assert_allclose(gram - np.diag(np.diag(gram)), 0)
+
+                for i, j in itertools.combinations(range(k), 2):
+                    interaction = design[:, i] * design[:, j]
+                    np.testing.assert_allclose(design.T @ interaction, 0)
 
     def test_previously_unsupported_counts_use_next_construction(self):
         self.assertEqual(definitive_screening_design(5).shape, (13, 5))
