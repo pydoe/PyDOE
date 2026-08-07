@@ -26,6 +26,7 @@ from importlib.metadata import PackageNotFoundError, version
 from .clustering import random_k_means
 from .factorial import (
     alias_vector_indices,
+    block_full_factorial,
     ff2n,
     fold,
     fracfact,
@@ -33,8 +34,19 @@ from .factorial import (
     fracfact_by_res,
     fracfact_opt,
     fullfact,
+    graeco_latin_square,
     gsd,
+    hyper_graeco_latin_square,
+    john_three_quarter_design,
+    latin_square,
     pbdesign,
+)
+from .mixture import (
+    extreme_vertices_design,
+    mixture_axial_design,
+    mixture_process_design,
+    simplex_centroid_design,
+    simplex_lattice_design,
 )
 from .optimal import (
     a_efficiency,
@@ -62,24 +74,47 @@ from .optimal import (
 )
 from .response_surface import (
     bbdesign,
+    block_ccdesign,
     ccdesign,
     doehlert_shell_design,
     doehlert_simplex_design,
     repeat_center,
+    small_composite_design,
     star,
     union,
 )
 from .sensitivity_analysis import morris_sampling, saltelli_sampling
+from .sequential import (
+    GaussianProcessRegressor,
+    expected_improvement,
+    probability_of_improvement,
+    sequential_design,
+    upper_confidence_bound,
+)
 from .space_filling.quasi_random import (
     cranley_patterson_shift,
+    faure_sequence,
     halton_sequence,
+    hammersley_sequence,
     korobov_sequence,
+    niederreiter_sequence,
     rank1_lattice,
     sobol_sequence,
     sukharev_grid,
 )
-from .space_filling.stochastic import lhs, random_uniform
+from .space_filling.stochastic import (
+    lhs,
+    maximin_design,
+    maxpro_design,
+    minimax_design,
+    nearly_orthogonal_lhs,
+    nested_lhs,
+    oa_lhd,
+    random_uniform,
+    sliced_lhs,
+)
 from .sparse_grid import doe_sparse_grid, sparse_grid_dimension
+from .specialized import definitive_screening_design, supersaturated_design
 from .taguchi import (
     TaguchiObjective,
     compute_snr,
@@ -87,20 +122,23 @@ from .taguchi import (
     list_orthogonal_arrays,
     taguchi_design,
 )
-from .utils import scale_samples, var_regression_matrix
+from .utils import iman_conover, scale_samples, var_regression_matrix
 
 
-try:  # noqa: RUF067
+try:
     __version__ = version(__name__)
 except PackageNotFoundError:
     __version__ = "unknown"
 
 __all__ = [
+    "GaussianProcessRegressor",
     "TaguchiObjective",
     "a_efficiency",
     "a_optimality",
     "alias_vector_indices",
     "bbdesign",
+    "block_ccdesign",
+    "block_full_factorial",
     "build_design_matrix",
     "build_uniform_moment_matrix",
     "c_optimality",
@@ -110,11 +148,15 @@ __all__ = [
     "criterion_value",
     "d_efficiency",
     "d_optimality",
+    "definitive_screening_design",
     "detmax",
     "doe_sparse_grid",
     "doehlert_shell_design",
     "doehlert_simplex_design",
     "e_optimality",
+    "expected_improvement",
+    "extreme_vertices_design",
+    "faure_sequence",
     "fedorov",
     "ff2n",
     "fold",
@@ -126,17 +168,33 @@ __all__ = [
     "g_optimality",
     "generate_candidate_set",
     "get_orthogonal_array",
+    "graeco_latin_square",
     "gsd",
     "halton_sequence",
+    "hammersley_sequence",
+    "hyper_graeco_latin_square",
     "i_optimality",
+    "iman_conover",
     "information_matrix",
+    "john_three_quarter_design",
     "korobov_sequence",
+    "latin_square",
     "lhs",
     "list_orthogonal_arrays",
+    "maximin_design",
+    "maxpro_design",
+    "minimax_design",
+    "mixture_axial_design",
+    "mixture_process_design",
     "modified_fedorov",
     "morris_sampling",
+    "nearly_orthogonal_lhs",
+    "nested_lhs",
+    "niederreiter_sequence",
+    "oa_lhd",
     "optimal_design",
     "pbdesign",
+    "probability_of_improvement",
     "random_k_means",
     "random_uniform",
     "rank1_lattice",
@@ -144,15 +202,22 @@ __all__ = [
     "s_optimality",
     "saltelli_sampling",
     "scale_samples",
+    "sequential_design",
     "sequential_dykstra",
     "simple_exchange_wynn_mitchell",
+    "simplex_centroid_design",
+    "simplex_lattice_design",
+    "sliced_lhs",
+    "small_composite_design",
     "sobol_sequence",
     "sparse_grid_dimension",
     "star",
     "sukharev_grid",
+    "supersaturated_design",
     "t_optimality",
     "taguchi_design",
     "union",
+    "upper_confidence_bound",
     "v_optimality",
     "var_regression_matrix",
 ]

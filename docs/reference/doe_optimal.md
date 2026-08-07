@@ -81,6 +81,16 @@ where each row corresponds to a candidate point and each column to a model term.
 - **Modified Fedorov**
 - **DETMAX**
 
+!!! note "Numerical conditioning during optimization"
+    During iterative search, algorithms evaluate candidate designs that may
+    produce an ill-conditioned information matrix (e.g. when too few distinct
+    points span the model space). PyDOE handles this automatically: when the
+    matrix is ill-conditioned, a Tikhonov regularization term $\lambda I$ is
+    added before inverting, ensuring smooth criterion values throughout the
+    search. The regularization strength is $\lambda = 10^{-8}$ by default and
+    only applies to intermediate states — the final converged design is
+    well-conditioned for the chosen model degree.
+
 ## Example Usage
 
 Generate a D-optimal design for a quadratic model with 2 factors:

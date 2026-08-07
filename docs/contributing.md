@@ -47,6 +47,19 @@ cd pydoe
 uv sync
 ```
 
+### Git Hooks
+
+The repo ships a pre-commit hook in `.git-hooks/pre-commit` that runs
+`ruff format --check`, `ruff check`, and the full test suite before each
+commit, mirroring the CI checks. Enable it once per clone with:
+
+```bash
+git config core.hooksPath .git-hooks
+```
+
+If any of these checks fail, the commit is aborted so you can fix the
+issue before committing.
+
 ### Commit Changes
 
 Switch to a new branch for your changes.
@@ -73,7 +86,7 @@ uv run pytest -n auto tests
 It is recommeded to add documentation about your change using docstrings or editing docs files. If you have made any changes to the documentation, build and preview it locally. API docs are auto-generated from docstrings, however you need to add function manually to the relevant docs file. Be sure to check the warnings and errors while building the docs.
 
 ```bash
-uv run mkdocs serve --livereload
+uv run python -m zensical build --clean --strict
 ```
 
 ### Open a Pull Request

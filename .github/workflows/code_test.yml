@@ -66,7 +66,7 @@ jobs:
       - setup
 
     steps:
-      - uses: actions/checkout@v6
+      - uses: actions/checkout@v7
 
       - name: Download Build Artifacts
         uses: actions/download-artifact@v8
@@ -89,7 +89,7 @@ jobs:
         run: uv run --no-sync pytest -v -n auto --cov --cov-report=xml tests --pyargs pydoe
 
       - name: Upload coverage to Codecov
-        uses: codecov/codecov-action@v6
+        uses: codecov/codecov-action@v7
         with:
           fail_ci_if_error: true
           use_oidc: true

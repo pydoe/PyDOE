@@ -31,32 +31,43 @@ design.
 points.
 """
 
+import warnings
+
 import numpy as np
-from scipy.linalg import inv
+from scipy.linalg import LinAlgWarning, inv
 
 
 def regularized_inv(M: np.ndarray, reg_param: float = 1e-8) -> np.ndarray:
     """
-    Compute regularized inverse of matrix M using M_reg = M + reg_param * I.
+    Compute the inverse of M, falling back to Tikhonov regularization when M
+    is ill-conditioned or singular.
+
+    ``scipy.linalg.inv`` raises ``LinAlgError`` only for exactly singular
+    matrices but issues ``LinAlgWarning`` for ill-conditioned ones (rcond near
+    zero).  By promoting that warning to an exception inside the context
+    manager we catch both cases uniformly and apply the regularization
+    ``M_reg = M + reg_param * I``, which shifts every eigenvalue up by
+    *reg_param* and guarantees positive-definiteness.
 
     Parameters
     ----------
-    M : ndarray
-        Matrix to invert.
+    M : ndarray of shape (p, p)
+        Square matrix to invert.
     reg_param : float, optional
-        Regularization parameter (default 1e-8).
+        Tikhonov regularization strength (default 1e-8).
 
     Returns
     -------
-    ndarray
-        Regularized inverse of M.
+    ndarray of shape (p, p)
+        Inverse (or regularized inverse) of M.
     """
-    try:
-        return inv(M)
-    except np.linalg.LinAlgError:
-        # Add regularization if matrix is singular
-        M_reg = M + reg_param * np.eye(M.shape[0])
-        return inv(M_reg)
+    with warnings.catch_warnings():
+        warnings.simplefilter("error", LinAlgWarning)
+        try:
+            return inv(M)
+        except (np.linalg.LinAlgError, LinAlgWarning):
+            M_reg = M + reg_param * np.eye(M.shape[0])
+            return inv(M_reg)
 
 
 def d_optimality(M: np.ndarray) -> float:

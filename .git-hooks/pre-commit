@@ -1,0 +1,24 @@
+#!/usr/bin/env bash
+#
+# Pre-commit hook for PyDOE.
+#
+# Runs the same checks as CI before allowing a commit:
+#   - ruff format --check
+#   - ruff check
+#   - pytest (including doctests)
+#
+# Enable with:
+#   git config core.hooksPath .git-hooks
+
+set -euo pipefail
+
+echo "Running ruff format --check..."
+uvx ruff format --check .
+
+echo "Running ruff check..."
+uvx ruff check .
+
+echo "Running test suite..."
+uv run pytest -n auto
+
+echo "All pre-commit checks passed."

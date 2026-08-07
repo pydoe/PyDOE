@@ -72,7 +72,8 @@ class TestLhs(unittest.TestCase):
             [0.90786845, 0.41539598, 0.72668075, 0.10171414],
             [0.45795029, 0.77429212, 0.35111023, 0.43224426],
         ]
-        actual = lhs(4, samples=5, criterion="lhsmu", random_state=42)
+        with self.assertWarns(DeprecationWarning):
+            actual = lhs(4, samples=5, criterion="lhsmu", random_state=42)
         np.testing.assert_allclose(actual, expected, atol=1e-7)
 
     def test_lhs_vanilla(self):

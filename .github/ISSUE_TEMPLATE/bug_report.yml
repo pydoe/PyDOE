@@ -1,0 +1,100 @@
+name: Bug Report
+description: Report a bug in pyDOE
+labels: ["bug"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Thank you for reporting a bug! Please provide the information below to help us diagnose and fix the issue quickly.
+
+  - type: textarea
+    id: debug_info
+    attributes:
+      label: Environment
+      description: "Output of pydoe --debug command"
+      placeholder: |
+        ### Debug Info
+
+        | Field | Value |
+        |-------|-------|
+        | PyDOE | 1.0.1 |
+        | Python | 3.12.3 (CPython) |
+        | OS | Linux |
+        | OS Release | 6.12.88 |
+        | Architecture | x86_64 |
+        | NumPy | 2.2.6 |
+        | SciPy | 1.15.3 |
+        | Install Source | pypi |
+    validations:
+      required: true
+
+  - type: dropdown
+    id: method
+    attributes:
+      label: Which method are you using?
+      options:
+        - "fullfact / ff2n / fracfact / pbdesign"
+        - "bbdesign / ccdesign / doehlert / star"
+        - "lhs / sobol_sequence / halton_sequence"
+        - "optimal_design / sequential_dykstra / fedorov"
+        - "taguchi_design / get_orthogonal_array"
+        - "morris_sampling / saltelli_sampling"
+        - "doe_sparse_grid"
+        - "random_k_means"
+        - "Other"
+    validations:
+      required: true
+
+  - type: textarea
+    id: expected
+    attributes:
+      label: Expected behavior
+      description: "What should happen?"
+      placeholder: "The design matrix should have shape (12, 3) with values in [-1, 1]"
+    validations:
+      required: true
+
+  - type: textarea
+    id: actual
+    attributes:
+      label: Actual behavior
+      description: "What actually happens instead?"
+      placeholder: "The design matrix has shape (12, 2) instead of (12, 3)"
+    validations:
+      required: true
+
+  - type: textarea
+    id: error
+    attributes:
+      label: Error traceback (if applicable)
+      description: "Paste the full traceback here if an exception occurred"
+      placeholder: |
+        ```
+        Traceback (most recent call last):
+          File "...", line X, in <module>
+            result = pydoe.fullfact([2, 3, 2])
+        ValueError: ...
+        ```
+
+  - type: textarea
+    id: minimal_example
+    attributes:
+      label: Minimal reproducible example
+      description: "Smallest code snippet that reproduces the issue"
+      placeholder: |
+        ```python
+        import pydoe
+        import numpy as np
+
+        result = pydoe.fullfact([2, 3, 2])
+        print(result.shape)
+        ```
+    validations:
+      required: true
+
+  - type: textarea
+    id: context
+    attributes:
+      label: Additional context
+      description: "What were you trying to accomplish? Any relevant details about input data, workarounds, or frequency?"
+      placeholder: "I was trying to design a 6-factor experiment with Box-Behnken..."

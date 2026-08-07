@@ -8,12 +8,13 @@ This section includes the following sampling design methods:
 
 - [Morris Method](#morris_method)
 - [Saltelli Sampling](#saltelli_sampling)
+- [Iman-Conover Method](#iman_conover)
 
 !!! hint
     All sampling design functions are available with:
 
     ```python
-    >>> from pydoe import morris_sampling, saltelli_sampling
+    >>> from pydoe import morris_sampling, saltelli_sampling, iman_conover
     ```
 
 ## Morris Method (`morris_sampling`) {#morris_method}
@@ -228,10 +229,53 @@ The matrix consists of:
 - The implementation automatically skips initial Sobol' sequence points to improve quality
 - All samples are returned in the `[0,1]` hypercube and should be transformed to desired bounds
 
+## Iman-Conover Method (`iman_conover`) {#iman_conover}
+
+The **Iman-Conover method** induces a target rank correlation structure
+among columns of a sample matrix without changing the marginal
+distribution of any column. It is widely used in Monte Carlo simulation
+and sensitivity analysis to model correlated uncertain parameters that
+have been sampled independently from arbitrary marginal distributions.
+
+Given a sample matrix `data` of shape `(n, k)` (each column drawn from
+its own marginal distribution) and a target correlation matrix
+`correlation_matrix` of shape `(k, k)`, the method reorders the rows of
+each column so that the resulting matrix has approximately the requested
+Spearman rank correlation structure:
+
+```python
+>>> iman_conover(data, correlation_matrix, seed=None)
+```
+
+- `data`: array of shape `(n, k)` — `n` samples of `k` variables.
+- `correlation_matrix`: array of shape `(k, k)` — target correlation
+  matrix, must be symmetric positive definite.
+- `seed`: optional `int` or `numpy.random.Generator` for reproducibility.
+
+### Usage Example
+
+```python
+>>> import numpy as np
+>>> from pydoe import iman_conover
+>>> rng = np.random.default_rng(0)
+>>> data = rng.normal(size=(1000, 2))
+>>> target = np.array([[1.0, 0.8], [0.8, 1.0]])
+>>> reordered = iman_conover(data, target, seed=0)
+>>> reordered.shape
+(1000, 2)
+```
+
+!!! note
+    The marginal distribution of each column of `data` is preserved
+    exactly — only the *order* of the values within each column changes.
+    Only the rank correlation between columns is altered to approximate
+    `correlation_matrix`.
+
 ## References
 
 - [Campolongo, F., Cariboni, J., & Saltelli, A. (2007). An effective screening design for sensitivity analysis of large models. *Environmental Modelling & Software*, 22(10), 1509-1518.](https://doi.org/10.1016/j.envsoft.2006.10.004)
 - [Campolongo, F., Saltelli, A., & Cariboni, J. (2011). From screening to quantitative sensitivity analysis. A unified approach. *Computer Physics Communications*, 182, 978-988.](https://doi.org/10.1016/j.cpc.2010.12.039)
+- [Iman, R. L., and Conover, W. J. (1982). A distribution-free approach to inducing rank correlation among input variables. *Communications in Statistics - Simulation and Computation*, 11(3), 311-334.](https://doi.org/10.1080/03610918208812265)
 - [Morris, M. D. (1991). Factorial sampling plans for preliminary computational experiments. *Technometrics*, 33(2), 161-174.](https://doi.org/10.1080/00401706.1991.10484804)
 - [Saltelli, A. (2002). Making best use of model evaluations to compute sensitivity indices. *Computer Physics Communications*, 145(2), 280-297.](https://doi.org/10.1016/S0010-4655(02)00280-1)
 - [Sobol', I. M. (2001). Global sensitivity indices for nonlinear mathematical models and their Monte Carlo estimates. *Mathematics and Computers in Simulation*, 55(1-3), 271-280.](https://doi.org/10.1016/S0378-4754(00)00270-6)

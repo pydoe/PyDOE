@@ -129,7 +129,7 @@ def sequential_dykstra(
     return design
 
 
-def simple_exchange_wynn_mitchell(  # noqa: PLR0913, PLR0917
+def simple_exchange_wynn_mitchell(  # ruff: ignore[too-many-arguments, too-many-positional-arguments]
     candidates: np.ndarray,
     n_points: int,
     degree: int,
@@ -205,7 +205,7 @@ def simple_exchange_wynn_mitchell(  # noqa: PLR0913, PLR0917
     return design
 
 
-def fedorov(  # noqa: PLR0913, PLR0917
+def fedorov(  # ruff: ignore[too-many-arguments, too-many-positional-arguments]
     candidates: np.ndarray,
     n_points: int,
     degree: int,
@@ -278,7 +278,7 @@ def fedorov(  # noqa: PLR0913, PLR0917
     return design
 
 
-def modified_fedorov(  # noqa: PLR0913, PLR0917
+def modified_fedorov(  # ruff: ignore[too-many-arguments, too-many-positional-arguments]
     candidates: np.ndarray,
     n_points: int,
     degree: int,
@@ -353,7 +353,7 @@ def modified_fedorov(  # noqa: PLR0913, PLR0917
     return design
 
 
-def detmax(  # noqa: PLR0913, PLR0914, PLR0917
+def detmax(  # ruff: ignore[too-many-arguments, too-many-positional-arguments]
     candidates: np.ndarray,
     n_points: int,
     degree: int,

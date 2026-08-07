@@ -222,12 +222,15 @@ nav:
   - Reference:
     - Factorial Designs: reference/factorial.md
     - Response Surface Designs: reference/response_surface.md
+    - Mixture Designs: reference/mixture.md
     - Randomized Designs: reference/randomized.md
     - Low-Discrepancy Sequences: reference/low_discrepancy_sequences.md
     - Sampling Designs: reference/sampling_designs.md
     - Taguchi Designs: reference/taguchi.md
     - Optimal Designs: reference/doe_optimal.md
     - Sparse Grid Designs: reference/sparse_grid.md
+    - Specialized Designs: reference/specialized.md
+    - Sequential Designs: reference/sequential.md
   - Changelog: changelog.md
 
 plugins:

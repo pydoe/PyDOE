@@ -6,7 +6,7 @@ from warnings import warn
 import numpy as np
 
 
-def random_k_means(  # noqa: PLR0913, PLR0917
+def random_k_means(  # ruff: ignore[too-many-arguments, too-many-positional-arguments]
     num_points: int,
     dimension: int,
     num_steps: int | None = None,

@@ -30,6 +30,18 @@ It provides:
   - Plackett-Burman (``pbdesign``)
   - Generalized Subset Designs (``gsd``)
   - Fold-over Designs (``fold``)
+  - John's 3/4 Fractional Factorial (``john_three_quarter_design``)
+  - Latin Square Designs (``latin_square``)
+  - Graeco-Latin Square Designs (``graeco_latin_square``)
+  - Hyper-Graeco-Latin Square Designs (``hyper_graeco_latin_square``)
+  - Blocking of Full Factorial Designs (``block_full_factorial``)
+
+- **Mixture Designs**
+  - Simplex-Lattice Design (``simplex_lattice_design``)
+  - Simplex-Centroid Design (``simplex_centroid_design``)
+  - Axial (Screening) Design (``mixture_axial_design``)
+  - Extreme-Vertices Design (``extreme_vertices_design``)
+  - Mixture-Process Variable Design (``mixture_process_design``)
 
 - **Response-Surface Designs**
   - Box-Behnken (``bbdesign``)
@@ -38,17 +50,29 @@ It provides:
   - Star Designs (``star``)
   - Union Designs (``union``)
   - Repeated Center Points (``repeat_center``)
+  - Blocked Central Composite Design (``block_ccdesign``)
+  - Small Composite Design (``small_composite_design``)
 
 - **Space-Filling Designs**
   - Latin-Hypercube (``lhs``)
+  - Orthogonal Array-based Latin Hypercube (``oa_lhd``)
+  - Sliced Latin Hypercube (``sliced_lhs``)
+  - Nested Latin Hypercube (``nested_lhs``)
+  - Maximin Distance Design (``maximin_design``)
+  - Minimax Distance Design (``minimax_design``)
+  - Maximum Projection Design (``maxpro_design``)
+  - Nearly Orthogonal Latin Hypercube (``nearly_orthogonal_lhs``)
   - Random Uniform (``random_uniform``)
 
 - **Low-Discrepancy Sequences**
   - Sukharev Grid (``sukharev_grid``)
   - Sobol’ Sequence (``sobol_sequence``)
   - Halton Sequence (``halton_sequence``)
+  - Hammersley Point Set (``hammersley_sequence``)
   - Rank-1 Lattice Design (``rank1_lattice``)
   - Korobov Sequence (``korobov_sequence``)
+  - Faure Sequence (``faure_sequence``)
+  - Niederreiter Sequence (``niederreiter_sequence``)
   - Cranley-Patterson Randomization (``cranley_patterson_shift``)
 
 - **Clustering Designs**
@@ -57,6 +81,7 @@ It provides:
 - **Sensitivity Analysis Designs**
   - Morris Method (``morris_sampling``)
   - Saltelli Sampling (``saltelli_sampling``)
+  - Iman-Conover Method (``iman_conover``)
 
 - **Taguchi Designs**
   - Orthogonal arrays and robust design utilities (``taguchi_design``, ``compute_snr``, ``get_orthogonal_array``, ``list_orthogonal_arrays``, ``TaguchiObjective``)
@@ -71,3 +96,12 @@ It provides:
 - **Sparse Grid Designs**
   - Sparse Grid Design (``doe_sparse_grid``)
   - Sparse Grid Dimension (``sparse_grid_dimension``)
+
+- **Specialized Designs**
+  - Definitive Screening Design (``definitive_screening_design``)
+  - Supersaturated Design (``supersaturated_design``)
+
+- **Sequential / Adaptive Designs**
+  - Sequential Design Driver (``sequential_design``)
+  - Gaussian Process Surrogate (``GaussianProcessRegressor``)
+  - Acquisition Functions (``expected_improvement``, ``probability_of_improvement``, ``upper_confidence_bound``)

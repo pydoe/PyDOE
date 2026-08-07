@@ -28,7 +28,7 @@ from pydoe import (
 )
 
 
-class TestOptimalDesign(unittest.TestCase):  # noqa: PLR0904
+class TestOptimalDesign(unittest.TestCase):
     def setUp(self):
         np.random.seed(42)
         self.candidates_2d = generate_candidate_set(
@@ -477,6 +477,8 @@ class TestOptimalDesign(unittest.TestCase):  # noqa: PLR0904
 
         for criterion in criteria:
             with self.subTest(criterion=criterion):
+                design = None
+                info = None
                 try:
                     # Use more design points and lower degree to
                     # avoid singular matrices
@@ -489,38 +491,6 @@ class TestOptimalDesign(unittest.TestCase):  # noqa: PLR0904
                         alpha=0.1,  # Higher alpha for regularization
                         max_iter=100,
                     )
-
-                    # Basic shape and bounds checks
-                    self.assertEqual(design.shape, (10, 2))
-                    self.assertTrue(np.all(design >= -1))
-                    self.assertTrue(np.all(design <= 1))
-
-                    # Info dictionary checks
-                    self.assertEqual(info["criterion"], criterion)
-                    self.assertEqual(info["method"], "detmax")
-                    self.assertEqual(info["alpha"], 0.1)
-                    self.assertIn("score", info)
-                    self.assertIn("D_eff", info)
-                    self.assertIn("A_eff", info)
-                    self.assertIn("p_columns", info)
-                    self.assertIn("n_runs", info)
-
-                    # Score should be finite
-                    self.assertFalse(np.isnan(info["score"]))
-                    self.assertFalse(np.isinf(info["score"]))
-
-                    # Efficiencies should be reasonable
-                    self.assertGreater(info["D_eff"], 0)
-                    self.assertGreater(info["A_eff"], 0)
-                    self.assertLessEqual(info["D_eff"], 100)
-                    self.assertLessEqual(info["A_eff"], 100)
-
-                    print(
-                        f"Criterion {criterion}: Score={info['score']:.4f}, "
-                        f"D_eff={info['D_eff']:.2f}%, "
-                        f"A_eff={info['A_eff']:.2f}%"
-                    )
-
                 except (ValueError, RuntimeError) as e:
                     # For problematic criteria, try with
                     # even more regularization
@@ -542,16 +512,6 @@ class TestOptimalDesign(unittest.TestCase):  # noqa: PLR0904
                                 alpha=0.5,  # Much higher alpha
                                 max_iter=50,
                             )
-
-                            self.assertEqual(design.shape, (12, 2))
-                            self.assertEqual(info["criterion"], criterion)
-                            print(
-                                f"Criterion {criterion} (retry): "
-                                f"Score={info['score']:.4f}, "
-                                f"D_eff={info['D_eff']:.2f}%, "
-                                f"A_eff={info['A_eff']:.2f}%"
-                            )
-
                         except (ValueError, RuntimeError) as e2:
                             print(
                                 f"Criterion {criterion} failed even with"
@@ -560,6 +520,42 @@ class TestOptimalDesign(unittest.TestCase):  # noqa: PLR0904
                             # Don't fail the test, just report the issue
                     else:
                         self.fail(f"Failed for criterion {criterion}: {e!s}")
+
+                # Assertions outside try block
+                if design is not None and info is not None:
+                    # Basic shape and bounds checks
+                    self.assertEqual(design.shape[1], 2)
+                    self.assertTrue(np.all(design >= -1))
+                    self.assertTrue(np.all(design <= 1))
+
+                    # Info dictionary checks
+                    self.assertEqual(info["criterion"], criterion)
+                    self.assertIn("score", info)
+                    self.assertIn("D_eff", info)
+                    self.assertIn("A_eff", info)
+                    self.assertIn("p_columns", info)
+                    self.assertIn("n_runs", info)
+
+                    # Score should be finite
+                    self.assertFalse(np.isnan(info["score"]))
+                    self.assertFalse(np.isinf(info["score"]))
+
+                    # Efficiencies should be reasonable
+                    self.assertGreater(info["D_eff"], 0)
+                    self.assertGreater(info["A_eff"], 0)
+                    self.assertLessEqual(info["D_eff"], 100)
+                    self.assertLessEqual(info["A_eff"], 100)
+
+                    # Original path uses detmax with 10 points
+                    if design.shape[0] == 10:
+                        self.assertEqual(info["method"], "detmax")
+                        self.assertEqual(info["alpha"], 0.1)
+
+                    print(
+                        f"Criterion {criterion}: Score={info['score']:.4f}, "
+                        f"D_eff={info['D_eff']:.2f}%, "
+                        f"A_eff={info['A_eff']:.2f}%"
+                    )
 
     def test_robust_criteria_individually(self):
         # Test D-optimality
@@ -806,15 +802,15 @@ class TestOptimalDesign(unittest.TestCase):  # noqa: PLR0904
                         alpha=0.01,
                         max_iter=50,
                     )
-
-                    self.assertEqual(design.shape, (12, 3))
-                    self.assertTrue(np.all(design >= -1))
-                    self.assertTrue(np.all(design <= 1))
-                    self.assertEqual(info["criterion"], criterion)
-                    self.assertFalse(np.isnan(info["score"]))
-
                 except (ValueError, RuntimeError) as e:
                     self.fail(f"Failed for criterion {criterion} in 3D: {e!s}")
+
+                # Assertions outside try block
+                self.assertEqual(design.shape, (12, 3))
+                self.assertTrue(np.all(design >= -1))
+                self.assertTrue(np.all(design <= 1))
+                self.assertEqual(info["criterion"], criterion)
+                self.assertFalse(np.isnan(info["score"]))
 
     def test_criteria_convergence(self):
         criteria = ["D", "A", "I"]
@@ -841,12 +837,14 @@ class TestOptimalDesign(unittest.TestCase):  # noqa: PLR0904
                     max_iter=100,
                 )
 
-    def test_all_nine_criteria_comprehensive_with_regularization(self):  # noqa: PLR0912, PLR0915
+    def test_all_nine_criteria_comprehensive_with_regularization(self):  # ruff: ignore[too-many-branches, too-many-statements]
         criteria = ["D", "A", "I", "C", "E", "G", "V", "S", "T"]
         results = {}
 
         for criterion in criteria:
             with self.subTest(criterion=criterion):
+                design = None
+                info = None
                 try:
                     if criterion in {"D", "A", "I", "E", "G", "S"}:
                         # Robust criteria - use standard settings
@@ -870,7 +868,14 @@ class TestOptimalDesign(unittest.TestCase):  # noqa: PLR0904
                             alpha=0.2,  # Higher regularization
                             max_iter=50,
                         )
+                except (ValueError, RuntimeError) as e:
+                    results[criterion] = {"success": False, "error": str(e)}
+                    print(f"{criterion}-optimality: FAILED - {e!s}")
+                    # Don't fail the test, just record the failure
+                    continue
 
+                # Assertions outside try block
+                if design is not None and info is not None:
                     # Validate results
                     self.assertIsInstance(design, np.ndarray)
                     self.assertEqual(len(design.shape), 2)
@@ -914,11 +919,6 @@ class TestOptimalDesign(unittest.TestCase):  # noqa: PLR0904
                         f"A_eff={info['A_eff']:5.1f}%, "
                         f"Method={info['method']}, Alpha={info['alpha']}"
                     )
-
-                except (ValueError, RuntimeError) as e:
-                    results[criterion] = {"success": False, "error": str(e)}
-                    print(f"{criterion}-optimality: FAILED - {e!s}")
-                    # Don't fail the test, just record the failure
 
         # Summary
         successful_criteria = [

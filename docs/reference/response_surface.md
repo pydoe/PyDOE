@@ -4,6 +4,8 @@ be described:
 - [Box-Behnken](#box_behnken)
 - [Central Composite](#central_composite)
 - [Doehlert Design](#doehlert_design)
+- [Blocked Central Composite Design](#blocked-central-composite-design-block_ccdesign)
+- [Small Composite Design (Hartley)](#small-composite-design-hartley-small_composite_design)
 
 !!! hint
     All available designs can be accessed after a simple import statement:
@@ -13,6 +15,8 @@ be described:
     ...     ccdesign,
     ...     doehlert_shell_design,
     ...     doehlert_simplex_design,
+    ...     block_ccdesign,
+    ...     small_composite_design,
     ... )
     ```
 
@@ -208,6 +212,56 @@ array([[ 0.      ,  0.       , 0.        ],
 !!! note
     Doehlert designs are recommended for response surface modeling when good space coverage and fewer experimental runs are desired.
 
+
+## Blocked Central Composite Design (`block_ccdesign`) {#blocked-central-composite-design-block_ccdesign}
+
+When the factorial portion and the axial portion of a central composite
+design must be run in separate blocks, `block_ccdesign` chooses the
+axial distance `alpha` orthogonally so the block effect does not bias
+the estimated factor effects, and returns a block label for each run.
+
+```pycon
+>>> design, blocks = block_ccdesign(n, center=(4, 4))  # (1)!
+```
+
+1. `n` — number of factors (≥ 2). `center` — number of center runs added
+   to the factorial block and the axial block, respectively.
+
+```pycon
+>>> design, blocks = block_ccdesign(2, center=(2, 2))
+>>> blocks
+array([0, 0, 0, 0, 0, 0, 1, 1, 1, 1, 1, 1])
+```
+
+!!! note
+    Block 0 is the $2^n$ factorial points plus `center[0]` center runs;
+    block 1 is the $2n$ axial points plus `center[1]` center runs.
+
+## Small Composite Design (Hartley) (`small_composite_design`) {#small-composite-design-hartley-small_composite_design}
+
+Hartley's small composite design augments a resolution-III fractional
+factorial (instead of a full $2^n$ factorial) with star points and
+center runs, fitting a full quadratic model with substantially fewer
+runs — particularly useful for 4-5 factors.
+
+```pycon
+>>> small_composite_design(n, center=(4, 4))  # (1)!
+```
+
+1. `n` — number of factors (≥ 3). `center` — number of center runs
+   added to the cube portion and the star portion, respectively.
+
+For 4 factors this needs only 20 runs versus 30 for a standard CCD
+built on the full $2^4$ factorial:
+
+```pycon
+>>> small_composite_design(4, center=(2, 2)).shape[0]
+20
+```
+
+!!! note
+    Reference: Hartley, H. O. (1959). Smallest composite designs for
+    quadratic response surfaces. *Technometrics*, 1(4), 56-63.
 
 ## More Information
 

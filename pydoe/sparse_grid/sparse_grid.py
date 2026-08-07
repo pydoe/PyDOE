@@ -99,7 +99,7 @@ def sparse_grid_dimension(n_level: int, n_factors: int) -> int:
     return _spdim_formula(n_level, n_factors)
 
 
-def _spdim_formula(n: int, d: int) -> int:  # noqa: PLR0911
+def _spdim_formula(n: int, d: int) -> int:  # ruff: ignore[too-many-return-statements]
     """
     Sparse grid dimension formulas from MATLAB spinterp spdim function.
 
@@ -167,7 +167,7 @@ def _spdim_formula(n: int, d: int) -> int:  # noqa: PLR0911
         )
 
 
-def _generate_sparse_grid_points(  # noqa: PLR0912
+def _generate_sparse_grid_points(  # ruff: ignore[too-many-branches]
     n_level: int, n_factors: int, grid_type: str
 ) -> np.ndarray:
     target_count = _spdim_formula(n_level, n_factors)
@@ -190,7 +190,7 @@ def _generate_sparse_grid_points(  # noqa: PLR0912
                 points.append(point)
 
     # Level 2+: structured interior points
-    if n_level >= 2:  # noqa: PLR1702
+    if n_level >= 2:
         grid_size = min(n_level + 2, 7)
         coords = np.linspace(0, 1, grid_size)
 

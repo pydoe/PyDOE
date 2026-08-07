@@ -12,7 +12,7 @@ PyDOE is built and maintained by a community of developers and researchers.
 
     **[Saud Zahir](https://github.com/saudzahirr)** · *Core Contributor*
 
-    Python and Rust developer focused on the scientific Python ecosystem.
+    Python and C++ developer focused on the scientific Python ecosystem.
 
 -   <figure markdown="span">
       [![tisimst](https://github.com/tisimst.png){ width=64 style="border-radius: 50%;" }](https://github.com/tisimst)
@@ -53,51 +53,11 @@ PyDOE is built and maintained by a community of developers and researchers.
     Java and Python developer. Fixed unexpected run counts in fractional factorial designs.
 
 -   <figure markdown="span">
-      [![ovidner](https://github.com/ovidner.png){ width=48 style="border-radius: 50%;" }](https://github.com/ovidner)
-    </figure>
-
-    **[Olle Vidner](https://github.com/ovidner)**
-
-    PhD student and mechanical engineer at Linköping University. Works on optimization and automation.
-
--   <figure markdown="span">
       [![RickardSjogren](https://github.com/RickardSjogren.png){ width=48 style="border-radius: 50%;" }](https://github.com/RickardSjogren)
     </figure>
 
     **[Rickard Sjögren](https://github.com/RickardSjogren)**
 
     Developer based in Umeå, Sweden. Co-created PyDOE2.
-
--   <figure markdown="span">
-      [![joergdietrich](https://github.com/joergdietrich.png){ width=48 style="border-radius: 50%;" }](https://github.com/joergdietrich)
-    </figure>
-
-    **[Jörg Dietrich](https://github.com/joergdietrich)**
-
-    Developer based in Mainz, Germany.
-
--   <figure markdown="span">
-      [![mutricyl](https://github.com/mutricyl.png){ width=48 style="border-radius: 50%;" }](https://github.com/mutricyl)
-    </figure>
-
-    **[mutricyl](https://github.com/mutricyl)**
-
-    Floating offshore wind turbine load analysis specialist at Sofresid, Nantes.
-
--   <figure markdown="span">
-      [![dargen3](https://github.com/dargen3.png){ width=48 style="border-radius: 50%;" }](https://github.com/dargen3)
-    </figure>
-
-    **[Ondřej Schindler](https://github.com/dargen3)**
-
-    Developer contributor.
-
--   <figure markdown="span">
-      [![dreavjr](https://github.com/dreavjr.png){ width=48 style="border-radius: 50%;" }](https://github.com/dreavjr)
-    </figure>
-
-    **[Eduardo Valle](https://github.com/dreavjr)**
-
-    AI/ML researcher at Intercom, Paris. Contributed additional tools for fractional designs.
 
 </div>
