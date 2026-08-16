@@ -121,6 +121,54 @@ class TestFactorial(unittest.TestCase):
             np.array([0.0, 0.0, 3.0, 4.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0]),
         )
 
+    def test_issue_152_saturated_designs(self):
+        """A 2^(k-p) design with k = 2^m - 1 factors in 2^m runs is legal.
+
+        These are the *saturated* resolution III designs: every one of the
+        2^m - m - 1 interaction columns of the m main factors carries an
+        erased factor.
+        """
+        for n_factors, n_erased, n_runs in [(3, 1, 4), (7, 4, 8), (15, 11, 16)]:
+            gen, alias_map, alias_vector = fracfact_opt(n_factors, n_erased)
+            design = fracfact(gen)
+            self.assertEqual(design.shape, (n_runs, n_factors))
+            self.assertEqual(len(gen.split()), n_factors)
+            # a saturated design uses every available interaction column
+            self.assertEqual(len(set(gen.split())), n_factors)
+            # main effects must never be aliased with one another
+            self.assertEqual(alias_vector[0], 0.0)
+            self.assertTrue(alias_map)
+
+    def test_issue_152_expected_saturated_generators(self):
+        """The 2^(7-4) and 2^(15-11) designs use every interaction column."""
+        gen, _, _ = fracfact_opt(7, 4)
+        self.assertEqual(
+            set(gen.split()), {"a", "b", "c", "ab", "ac", "bc", "abc"}
+        )
+
+        gen, _, _ = fracfact_opt(15, 11)
+        self.assertEqual(len(set(gen.split())), 15)
+        self.assertEqual(fracfact(gen).shape, (16, 15))
+
+    def test_fracfact_opt_no_erased_factors(self):
+        """n_erased = 0 must return the full factorial, not raise."""
+        gen, alias_map, alias_vector = fracfact_opt(3, 0)
+        self.assertEqual(gen, "a b c")
+        np.testing.assert_allclose(fracfact(gen), ff2n(3))
+        self.assertEqual(len(alias_map), 2**3 - 1)
+        np.testing.assert_array_equal(alias_vector, np.zeros(6))
+
+    def test_fracfact_opt_too_many_erased_factors(self):
+        """Beyond the saturated design there is nothing left to alias."""
+        with pytest.raises(
+            ValueError, match="Too many erased factors to create aliasing"
+        ):
+            fracfact_opt(4, 2)  # 2 main factors provide only 1 interaction
+        with pytest.raises(
+            ValueError, match="Too many erased factors to create aliasing"
+        ):
+            fracfact_opt(8, 5)  # 3 main factors provide only 4 interactions
+
     def test_fracfact_by_res_resolution_III(self):
         """Test resolution III designs"""
         # 8 runs should support 4 factors at resolution III
