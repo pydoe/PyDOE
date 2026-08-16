@@ -250,6 +250,45 @@ array([[-1., -1., -1.,  1.,  1.,  1.],
        [ 1.,  1.,  1.,  1.,  1.,  1.]])
 ```
 
+The number of runs is the smallest power of two in which the requested
+number of factors fits at the requested resolution — the entries of the
+table below. Seven factors at resolution III, for example, give the
+*saturated* $2^{7-4}_{III}$ design in 8 runs:
+
+```pycon
+>>> fracfact_by_res(7, 3).shape
+(8, 7)
+```
+
+A design of resolution `res` **or better** is returned. Four factors
+cannot be fitted into fewer than 8 runs at any resolution, and the 8-run
+design that reaches resolution IV is $2^{4-1}_{IV}$:
+
+```pycon
+>>> fracfact_by_res(4, 4).shape
+(8, 4)
+```
+
+!!! note "How the resolution is guaranteed"
+
+    A regular design with $n$ factors in $2^k$ runs is a choice of $n$
+    distinct non-zero column vectors in $\mathrm{GF}(2)^k$. A word of the
+    defining relation is a subset of those columns summing to zero, so
+
+    $$
+    \text{resolution} \ge R
+    \iff \text{no } R-1 \text{ or fewer columns sum to zero.}
+    $$
+
+    Columns are selected against that criterion directly. Checking only
+    that each *generator* is long enough is not sufficient — products of
+    generators can be shorter than either factor, which silently lowers
+    the resolution of the design.
+
+    A run size of $2^k$ carries at most $2^k - 1$ factors at resolution
+    III (the saturated design) and at most $2^{k-1}$ at resolution IV.
+    From resolution V upward there is no closed form.
+
 Available Factorial Designs (with Resolution)
 
 <div class="doe-table-wrapper">
