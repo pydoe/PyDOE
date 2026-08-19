@@ -15,6 +15,7 @@ Abraham Lee.
 
 from __future__ import annotations
 
+import collections
 import itertools
 import math
 import re
@@ -597,6 +598,34 @@ def fracfact_opt(
     ------
     ValueError
         If the number of factors is invalid or too many factors are erased.
+
+    Notes
+    -----
+    A :math:`2^{k-p}` design is built from :math:`m = k - p` main factors
+    spanning :math:`2^m` runs. Every erased factor is assigned to one of the
+    interaction columns of those main factors, and there are exactly
+
+    .. math::
+
+        \\sum_{j=2}^{m} \\binom{m}{j} = 2^m - m - 1
+
+    such columns. The design is therefore feasible if and only if
+    :math:`p \\le 2^m - m - 1`. The boundary case
+    :math:`p = 2^m - m - 1` consumes every interaction column and yields the
+    *saturated* resolution III design with :math:`k = 2^m - 1` factors in
+    :math:`2^m` runs, e.g. the :math:`2^{7-4}_{III}` design in 8 runs or the
+    :math:`2^{15-11}_{III}` design in 16 runs.
+
+    Examples
+    --------
+    ::
+
+        >>> gen, _alias_map, _alias_vector = fracfact_opt(7, 4)
+        >>> gen
+        'a b c abc bc ac ab'
+        >>> fracfact(gen).shape
+        (8, 7)
+
     """
 
     def n_comb(n: int, k: int) -> int:
@@ -614,12 +643,18 @@ def fracfact_opt(
         raise ValueError("Number of erased factors must be non-negative")
 
     n_main_factors = n_factors - n_erased
+    # Number of interaction columns available to carry the erased factors:
+    # sum_{j=2}^{m} C(m, j) = 2^m - m - 1 for m main factors.
     n_aliases = sum(
         n_comb(n_main_factors, n) for n in range(2, n_main_factors + 1)
     )
 
-    if n_erased > n_comb(n_aliases, n_erased):
-        raise ValueError("Too many erased factors to create aliasing")
+    if n_erased > n_aliases:
+        raise ValueError(
+            "Too many erased factors to create aliasing: "
+            f"{n_main_factors} main factors provide only {n_aliases} "
+            f"interaction columns, but {n_erased} are needed"
+        )
 
     all_names = string.ascii_lowercase
     # factors = range(n_factors)
@@ -643,10 +678,10 @@ def fracfact_opt(
     )
 
     for aliasing in all_combinations:
-        aliasing_design = " ".join([
-            "".join([all_names[f] for f in a]) for a in aliasing
-        ])
-        complete_design = main_design + " " + aliasing_design
+        aliasing_design = ["".join([all_names[f] for f in a]) for a in aliasing]
+        # ``aliasing_design`` is empty when n_erased == 0; joining the parts
+        # this way keeps the generator free of a trailing separator.
+        complete_design = " ".join([main_design, *aliasing_design])
         design = fracfact(complete_design)
         if design.shape != design_shape:
             raise ValueError(
@@ -694,27 +729,45 @@ def fracfact_aliasing(design: np.ndarray) -> tuple[list[str], np.ndarray]:
     Raises
     ------
     ValueError
-        If the design is too large (more than 20 factors).
+        If the design is too large (more than 20 factors), or if it contains
+        entries other than -1 and +1.
+
+    Notes
+    -----
+    Every one of the :math:`2^{k} - 1` factors and interactions is reduced to
+    the bit pattern of the rows in which its contrast is negative. Because the
+    columns only hold :math:`\\pm 1`, the elementwise product of a set of
+    columns is the bitwise *exclusive or* of their patterns, so the whole
+    alias structure is found with integer arithmetic instead of one NumPy
+    reduction per subset.
     """
     _n_rounds, n_factors = design.shape
 
     if n_factors > 20:
         raise ValueError("Design too big, use 20 factors or less")
 
+    if not np.all(np.abs(design) == 1):
+        raise ValueError("Design must only contain the levels -1 and +1")
+
     all_names = string.ascii_lowercase
     factors = range(n_factors)
+
+    # Bit i of column_bits[j] is set when design[i, j] is at its low level.
+    column_bits = [
+        sum(1 << int(row) for row in np.flatnonzero(design[:, j] < 0))
+        for j in factors
+    ]
+
     all_combinations = itertools.chain.from_iterable(
         itertools.combinations(factors, n) for n in range(1, n_factors + 1)
     )
     aliases = {}
 
     for combination in all_combinations:
-        contrast = np.prod(design[:, combination], axis=1)
-        contrast.flags.writeable = False
-        aliases[contrast.data.tobytes()] = aliases.get(
-            contrast.data.tobytes(), []
-        )
-        aliases[contrast.data.tobytes()].append(combination)
+        contrast = 0
+        for factor in combination:
+            contrast ^= column_bits[factor]
+        aliases.setdefault(contrast, []).append(combination)
 
     aliases_list = []
     for alias in aliases.values():
@@ -731,12 +784,18 @@ def fracfact_aliasing(design: np.ndarray) -> tuple[list[str], np.ndarray]:
             "".join([all_names[f] for f in a]) for a in alias
         ])
         aliases_readable.append(alias_readable)
-        for sizes in itertools.combinations([len(a) for a in alias], 2):
-            if not (sizes[0] >= 0 and sizes[1] >= 0):
-                raise ValueError(f"Invalid alias sizes: {sizes}")
-            if sizes[0] > sizes[1]:
-                raise ValueError(f"Alias sizes not in order: {sizes}")
-            alias_matrix[sizes[0] - 1, sizes[1] - 1] += 1
+        # Count the aliased pairs by interaction order rather than iterating
+        # over every pair: an alias chain holding `count[s]` terms of order
+        # `s` contributes count[s] * count[t] pairs of orders (s, t), and
+        # count[s] * (count[s] - 1) / 2 pairs of equal order s.
+        counts = collections.Counter(len(a) for a in alias)
+        orders = sorted(counts)
+        for i, low in enumerate(orders):
+            alias_matrix[low - 1, low - 1] += (
+                counts[low] * (counts[low] - 1) // 2
+            )
+            for high in orders[i + 1 :]:
+                alias_matrix[low - 1, high - 1] += counts[low] * counts[high]
 
     alias_vector = alias_matrix[alias_vector_indices(n_factors)]
 

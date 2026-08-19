@@ -6,8 +6,14 @@ All notable changes to PyDOE are documented here.
 
 ## [**Latest**](https://github.com/pydoe/pydoe/compare/v1.3.0...master)
 
+### :material-wrench: Fixed
+- `fracfact_opt` no longer rejects saturated designs. The feasibility check compared the number of erased factors against $\binom{n_{\text{aliases}}}{p}$ instead of against the number of available interaction columns $2^m - m - 1$, so every resolution III design with $k = 2^m - 1$ factors in $2^m$ runs — such as $2^{7-4}_{III}$ and $2^{15-11}_{III}$ — raised *"Too many erased factors to create aliasing"*. `fracfact_opt(n, 0)` also raised `IndexError` instead of returning the full factorial ([#152](https://github.com/pydoe/pydoe/issues/152))
+
 ### :material-refresh: Changed
 - Generalize `definitive_screening_design` with arbitrary continuous-factor counts, two-level categorical factors, orthogonal and interaction-de-aliased methods, minimum-run augmentation, and fake factors while preserving historical one-argument results ([#145](https://github.com/pydoe/pydoe/pull/145)) — [@danieleongari](https://github.com/danieleongari)
+
+### :material-speedometer: Performance
+- `fracfact_aliasing` reduces each contrast to the bit pattern of its negative rows, so the elementwise product of a subset of columns becomes a bitwise exclusive or. The alias structure of a 15-factor design is now found in well under a second instead of about a minute ([#152](https://github.com/pydoe/pydoe/issues/152))
 
 ---
 
