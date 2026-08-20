@@ -51,8 +51,8 @@ theme:
         name: Switch to light mode
 
   # Logo and favicon
-  favicon: assets/images/pydoe.ico
-  logo: assets/images/pydoe.png
+  favicon: assets/images/pydoe-icon.svg
+  logo: assets/images/pydoe-icon.png
 
   # Font configuration
   font:

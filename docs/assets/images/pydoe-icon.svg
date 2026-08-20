@@ -1,0 +1,20 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 16 16" width="1024" height="1024">
+<defs>
+<clipPath id="cube"><path d="M7.1376 3.1062 Q8 2.6 8.8624 3.1062 L11.7376 4.7938 Q12.6 5.3 12.6 6.3 L12.6 9.7 Q12.6 10.7 11.7376 11.2062 L8.8624 12.8938 Q8 13.4 7.1376 12.8938 L4.2624 11.2062 Q3.4 10.7 3.4 9.7 L3.4 6.3 Q3.4 5.3 4.2624 4.7938 Z"></path></clipPath>
+<g id="d1"><rect x="2.04" y="0.04" width="0.92" height="6.92" rx="0.3"></rect><rect x="1.04" y="1.04" width="1.92" height="0.92" rx="0.3"></rect><rect x="1.04" y="6.04" width="2.92" height="0.92" rx="0.3"></rect><rect x="1.64" y="0.64" width="0.72" height="0.72" rx="0.3"></rect><rect x="1.64" y="1.64" width="0.72" height="0.72" rx="0.3"></rect><rect x="1.64" y="5.64" width="0.72" height="0.72" rx="0.3"></rect><rect x="2.64" y="5.64" width="0.72" height="0.72" rx="0.3"></rect></g>
+<g id="d0"><rect x="1.04" y="0.04" width="2.92" height="0.92" rx="0.3"></rect><rect x="1.04" y="6.04" width="2.92" height="0.92" rx="0.3"></rect><rect x="0.04" y="1.04" width="0.92" height="4.92" rx="0.3"></rect><rect x="4.04" y="1.04" width="0.92" height="4.92" rx="0.3"></rect><rect x="3.04" y="2.04" width="1.92" height="0.92" rx="0.3"></rect><rect x="2.04" y="3.04" width="0.92" height="0.92" rx="0.3"></rect><rect x="0.04" y="4.04" width="1.92" height="0.92" rx="0.3"></rect><rect x="0.64" y="0.64" width="0.72" height="0.72" rx="0.3"></rect><rect x="3.64" y="0.64" width="0.72" height="0.72" rx="0.3"></rect><rect x="3.64" y="1.64" width="0.72" height="0.72" rx="0.3"></rect><rect x="2.64" y="2.64" width="0.72" height="0.72" rx="0.3"></rect><rect x="3.64" y="2.64" width="0.72" height="0.72" rx="0.3"></rect><rect x="1.64" y="3.64" width="0.72" height="0.72" rx="0.3"></rect><rect x="0.64" y="3.64" width="0.72" height="0.72" rx="0.3"></rect><rect x="0.64" y="4.64" width="0.72" height="0.72" rx="0.3"></rect><rect x="0.64" y="5.64" width="0.72" height="0.72" rx="0.3"></rect><rect x="3.64" y="5.64" width="0.72" height="0.72" rx="0.3"></rect></g>
+</defs>
+<rect width="16" height="16" fill="#00F0FF"></rect>
+<g transform="translate(8 8) scale(1.3) translate(-8 -8)">
+<g clip-path="url(#cube)">
+<polygon points="8,2.6 12.6,5.3 8,8 3.4,5.3" fill="#00F0FF"></polygon>
+<polygon points="3.4,5.3 8,8 8,13.4 3.4,10.7" fill="#FFA900"></polygon>
+<polygon points="12.6,5.3 12.6,10.7 8,13.4 8,8" fill="#00FF81"></polygon>
+</g>
+<g fill="#000000">
+<g transform="matrix(0.8624 0.5062 -0.8624 0.5062 8 5.3) scale(0.2) translate(-8.5 -3.5)"><use href="#d1" x="0"></use><use href="#d1" x="6"></use><use href="#d1" x="12"></use></g>
+<g transform="matrix(0.8624 0.5062 0 1 5.7 9.35) scale(0.2) translate(-8.5 -3.5)"><use href="#d0" x="0"></use><use href="#d1" x="6"></use><use href="#d0" x="12"></use></g>
+<g transform="matrix(0.8624 -0.5062 0 1 10.3 9.35) scale(0.2) translate(-8.5 -3.5)"><use href="#d1" x="0"></use><use href="#d0" x="6"></use><use href="#d0" x="12"></use></g>
+</g>
+</g>
+</svg>
