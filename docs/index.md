@@ -1,7 +1,6 @@
 # PyDOE
 
-![PyDOE](./assets/images/light-theme/pydoe-banner.svg#only-light)
-![PyDOE](./assets/images/dark-theme/pydoe-banner.svg#only-dark)
+![PyDOE](https://raw.githubusercontent.com/pydoe/pydoe/master/docs/assets/images/pydoe-banner.png)
 
 *An Experimental Design Package for Python*
 

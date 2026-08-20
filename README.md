@@ -1,3 +1,5 @@
+![PyDOE](https://raw.githubusercontent.com/pydoe/pydoe/master/docs/assets/images/pydoe-banner.png)
+
 PyDOE: An Experimental Design Package for Python
 ================================================
 
