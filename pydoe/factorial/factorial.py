@@ -22,7 +22,6 @@ import re
 import string
 
 import numpy as np
-from scipy.special import binom
 
 
 __all__ = [
@@ -310,16 +309,48 @@ def fracfact(gen: str) -> np.ndarray:
     return H
 
 
+# A design matrix has 2**k rows, so this cap also keeps `fracfact` from
+# being handed a request it could not allocate.
+_MAX_BASE_FACTORS = 26
+
+# Effort one run size may spend before the search gives up, counted in set
+# operations rather than in search nodes because the cost of a node grows
+# with the design. Giving up falls through to the next run size, which costs
+# runs but never resolution: designs that exist are found long before this,
+# and only proving that one does *not* exist is expensive. A call gives up
+# entirely after `_MAX_EXHAUSTED_SEARCHES` such run sizes, which keeps the
+# worst case bounded for requests far outside the published catalogues.
+_SEARCH_EFFORT_LIMIT = 1_000_000
+_MAX_EXHAUSTED_SEARCHES = 3
+
+# Maximum number of factors a regular resolution V design in 2**k runs can
+# carry, i.e. the maximum length of a binary linear code with k parity
+# checks and minimum distance 5. There is no closed form; entries up to
+# k = 7 were confirmed by exhaustive search over GF(2)**k and the remainder
+# come from the code tables (Grassl; Draper & Mitchell 1968 for k = 8).
+_MAX_FACTORS_RESOLUTION_V = {
+    1: 1,
+    2: 2,
+    3: 3,
+    4: 5,
+    5: 6,
+    6: 8,
+    7: 11,
+    8: 17,
+    9: 23,
+    10: 33,
+    11: 47,
+    12: 65,
+}
+
+
 def fracfact_by_res(n: int, res: int) -> np.ndarray:
-    """
+    r"""
     Create a 2-level fractional factorial design with `n` factors
     and resolution `res`.
 
-    Given a number of factors `n` and a desired resolution `res`, this function
-    determines a reasonable number of base factors (runs = 2^k) using standard
-    DOE tables where possible, and a calculated fallback otherwise. Generators
-    are then constructed to reach `n` total factors while respecting the
-    resolution constraints.
+    The design uses the smallest number of runs :math:`2^k` in which `n`
+    factors can be accommodated at resolution `res` or better.
 
     Parameters
     ----------
@@ -338,7 +369,8 @@ def fracfact_by_res(n: int, res: int) -> np.ndarray:
     Raises
     ------
     ValueError
-        If the inputs are invalid or the requested design cannot be constructed.
+        If `n` is below 2, if `res` is below 3, if the design would need
+        more than 26 base factors, or if no design could be constructed.
 
     Notes
     -----
@@ -365,9 +397,60 @@ def fracfact_by_res(n: int, res: int) -> np.ndarray:
          interactions. Three-factor interactions may be confounded with
          each other.
 
+    A design of resolution `res` or *better* is returned; requesting
+    resolution III for 4 factors, for instance, cannot be done in fewer
+    than 8 runs, and the 8-run design happens to be of resolution IV.
+
+    **Construction.** A regular design with `n` factors in :math:`2^k` runs
+    is a choice of `n` distinct non-zero column vectors in
+    :math:`\mathrm{GF}(2)^k`; a word of the defining relation is a subset of
+    those columns summing to zero, so
+
+    .. math::
+
+        \text{resolution} \ge R \iff
+        \text{no } R - 1 \text{ or fewer columns sum to zero.}
+
+    Since the columns must span :math:`\mathrm{GF}(2)^k`, the `k` standard
+    basis vectors are taken as the base factors ``a``, ``b``, ... and the
+    remaining columns are searched for in order of increasing interaction
+    order. This is what guarantees the resolution of the *whole* defining
+    relation rather than of each generator taken on its own: a design whose
+    generators are individually long enough can still have a short word among
+    their products.
+
+    The number of factors a run size can carry is
+    :math:`2^k - 1` at resolution III (the saturated design) and
+    :math:`2^{k-1}` at resolution IV; from resolution V upward there is no
+    closed form and tabulated maxima are used.
+
+    The run count is minimal at resolutions III and IV over the whole range
+    the 26-base-factor cap allows, and at resolutions V and VI for at least
+    20 factors, which covers every published catalogue. Beyond that - a
+    resolution of VII or more, or several dozen factors at resolution V -
+    the search may give up before it can prove that a run size is too small
+    and move on to the next one. The returned design always meets the
+    requested resolution; it may just use one more doubling than strictly
+    necessary. Requests large enough that several run sizes in a row are
+    inconclusive are rejected rather than ground out.
+
+    References
+    ----------
+    Fries, A., & Hunter, W. G. (1980). Minimum aberration 2^(k-p) designs.
+        *Technometrics*, 22(4), 601-608.
+    Chen, H., & Cheng, C.-S. (2006). Doubling and projection: a method of
+        constructing two-level designs of resolution IV.
+        *The Annals of Statistics*, 34(1), 546-558.
+    NIST/SEMATECH e-Handbook of Statistical Methods, Section 5.3.3.4.7 -
+        "Summary tables of useful fractional factorial designs",
+        https://www.itl.nist.gov/div898/handbook/pri/section3/pri3347.htm
+    Montgomery, D. C. (2012). *Design and Analysis of Experiments* (8th ed.),
+        Table 8.14. Wiley.
+
     Examples
     --------
     ::
+
         >>> fracfact_by_res(6, 3)
         array([[-1., -1., -1.,  1.,  1.,  1.],
                [-1., -1.,  1.,  1., -1., -1.],
@@ -377,138 +460,48 @@ def fracfact_by_res(n: int, res: int) -> np.ndarray:
                [ 1., -1.,  1., -1.,  1., -1.],
                [ 1.,  1., -1.,  1., -1., -1.],
                [ 1.,  1.,  1.,  1.,  1.,  1.]])
+
+    Seven factors fit in 8 runs at resolution III - the saturated
+    :math:`2^{7-4}_{III}` design::
+
+        >>> fracfact_by_res(7, 3).shape
+        (8, 7)
+
+    Four factors need those same 8 runs to reach resolution IV::
+
+        >>> fracfact_by_res(4, 4).shape
+        (8, 4)
+
     """
     if n < 2:
         raise ValueError("n must be at least 2")
     if res < 3:
         raise ValueError("resolution must be >= 3")
 
-    # trying the standard DOE tables first
-    k = _get_base_factors_from_table(n, res)
-    if k is None:
-        k = _calculate_min_base_factors(n, res)
-
-    if k > 26:
+    # n distinct non-zero columns are needed whatever the resolution, and
+    # GF(2)**k offers 2**k - 1 of them, so k >= n.bit_length().
+    k_min = int(n).bit_length()
+    if k_min > _MAX_BASE_FACTORS:
         raise ValueError("design requires more than 26 base factors")
 
-    #  validation
-    max_n = _max_factors_for_resolution(k, res)
-    if n > max_n:
-        raise ValueError(
-            f"{n} factors not possible at resolution {res} with {2**k} runs "
-            f"(max supported: {max_n})"
-        )
+    # A full factorial (k = n) always reaches the requested resolution, so
+    # the search terminates for every n the base-factor cap allows.
+    exhausted = 0
+    for k in range(k_min, min(max(n, k_min), _MAX_BASE_FACTORS) + 1):
+        if _max_factors_for_resolution(k, res) < n:
+            continue
+        columns, spent = _resolution_columns(k, n, res)
+        if columns is not None:
+            return fracfact(_generator_from_columns(columns, k))
+        if spent > _SEARCH_EFFORT_LIMIT:
+            exhausted += 1
+            if exhausted == _MAX_EXHAUSTED_SEARCHES:
+                break
 
-    # Base factor names: a, b, c, ...
-    base = list(string.ascii_lowercase[:k])
-
-    # Generator terms must be of order >= (res - 1)
-    combos = (
-        "".join(c)
-        for r in range(res - 1, len(base) + 1)
-        for c in itertools.combinations(base, r)
+    raise ValueError(
+        f"no design with {n} factors at resolution {res} could be "
+        "constructed; use a lower resolution or fewer factors"
     )
-    generated = list(itertools.islice(combos, n - k))
-
-    gen_str = " ".join(base + generated)
-    return fracfact(gen_str)
-
-
-def _get_base_factors_from_table(n: int, res: int) -> int | None:
-    """
-    Lookup k (base factors) from commonly used fractional factorial tables.
-    Returns None if the (n, res) pair is not in the table.
-
-    Parameters
-    ----------
-    n : int
-        Total number of factors.
-    res : int
-        Desired design resolution.
-
-    Returns
-    -------
-    int or None
-        The number of base factors k if found, otherwise None.
-    """
-    table = {
-        # Resolution III
-        (3, 3): 2,
-        (4, 3): 3,
-        (5, 3): 3,
-        (6, 3): 3,
-        (7, 3): 4,
-        (8, 3): 4,
-        (9, 3): 4,
-        (10, 3): 4,
-        (11, 3): 4,
-        (12, 3): 4,
-        (13, 3): 4,
-        (14, 3): 4,
-        (15, 3): 4,
-        # Resolution IV
-        (3, 4): 3,
-        (4, 4): 4,
-        (5, 4): 5,
-        (6, 4): 5,
-        (7, 4): 5,
-        (8, 4): 5,
-        (9, 4): 6,
-        (10, 4): 6,
-        (11, 4): 6,
-        (12, 4): 6,
-        (13, 4): 6,
-        (14, 4): 6,
-        (15, 4): 6,
-        # Resolution V
-        (4, 5): 5,
-        (5, 5): 5,
-        (6, 5): 6,
-        (7, 5): 6,
-        (8, 5): 7,
-        (9, 5): 7,
-        (10, 5): 7,
-        (11, 5): 7,
-        (12, 5): 8,
-        (13, 5): 8,
-        (14, 5): 8,
-        (15, 5): 8,
-    }
-    return table.get((n, res))
-
-
-def _calculate_min_base_factors(n: int, res: int) -> int:
-    """
-    Compute the smallest k such that a 2^k design can support n factors
-    at the requested resolution.
-
-    Parameters
-    ----------
-    n : int
-        Total number of factors.
-    res : int
-        Desired design resolution.
-
-    Returns
-    -------
-    int
-        The smallest k such that a 2^k design can support n factors at the
-        requested resolution.
-    """
-    if res == 3:
-        return max(2, math.ceil(math.log2(n + 1)))
-
-    if res in {4, 5}:
-        k = max(res - 1, math.ceil(math.log2(n + 1)))
-        while _max_factors_for_resolution(k, res) < n and k <= 26:
-            k += 1
-        return k
-
-    # Conservative fallback for higher resolutions
-    k = max(res - 1, math.ceil(math.log2(n + 1)))
-    while _max_factors_for_resolution(k, res) < n and k <= 26:
-        k += 1
-    return k
 
 
 def _max_factors_for_resolution(k: int, res: int) -> int:
@@ -527,35 +520,179 @@ def _max_factors_for_resolution(k: int, res: int) -> int:
     -------
     int
         The maximum number of factors achievable with k base factors at the
-        given resolution.
+        given resolution. Exact for resolutions III and IV and for the
+        tabulated resolution V run sizes; an upper bound otherwise.
     """
-    if k < res - 1:
-        return k
+    if k < 1:
+        return 0
+    if res <= 3:
+        # Saturated design: every non-zero vector of GF(2)**k is a column.
+        return (1 << k) - 1
+    if res == 4:
+        # The odd-weight vectors of GF(2)**k, i.e. the fold-over of the
+        # saturated resolution III design (Chen & Cheng 2006).
+        return 1 << (k - 1)
+    if res == 5 and k in _MAX_FACTORS_RESOLUTION_V:
+        return _MAX_FACTORS_RESOLUTION_V[k]
+    if res % 2 == 0:
+        # A design of even resolution is a design of resolution res - 1 with
+        # one extra parity column.
+        return _max_factors_for_resolution(k - 1, res - 1) + 1
 
-    total = k
-    for r in range(res - 1, k + 1):
-        total += int(binom(k, r))
-    return total
+    # Sphere-packing (Hamming) bound: with res = 2t + 1 the sums of t or
+    # fewer columns are distinct, so their number cannot exceed 2**k.
+    t = (res - 1) // 2
+    limit = 1 << k
+    n = k
+    while n < limit - 1 and sum(math.comb(n + 1, j) for j in range(t + 1)) <= (
+        limit
+    ):
+        n += 1
+    return n
 
 
-def _n_fac_at_res(n: int, res: int) -> int:
+def _candidate_columns(k: int) -> list[int]:
     """
-    Calculate number of possible factors for fractional factorial
-    design with `n` base factors at resolution `res`.
+    Interaction columns of GF(2)**k ordered by increasing interaction order.
 
     Parameters
     ----------
-    n : int
+    k : int
         Number of base factors.
-    res : int
-        Desired design resolution.
 
     Returns
     -------
-    int
-        The number of possible factors for the given resolution.
+    list of int
+        Bit masks of every non-zero vector of weight two or more, ordered
+        first by weight and then lexicographically, so that the generators
+        chosen from them are the low-order interactions first.
     """
-    return n + sum(int(binom(n, r)) for r in range(res - 1, n + 1))
+    return [
+        sum(1 << i for i in combination)
+        for order in range(2, k + 1)
+        for combination in itertools.combinations(range(k), order)
+    ]
+
+
+def _resolution_columns(
+    k: int, n: int, res: int, effort_limit: int = _SEARCH_EFFORT_LIMIT
+) -> tuple[list[int] | None, int]:
+    """
+    Search for `n` columns of GF(2)**k with no short dependency.
+
+    Parameters
+    ----------
+    k : int
+        Number of base factors, so the design has ``2**k`` runs.
+    n : int
+        Number of factors the design must carry.
+    res : int
+        Requested resolution.
+    effort_limit : int, optional
+        Number of set operations the search may spend before giving up.
+
+    Returns
+    -------
+    columns : list of int or None
+        Bit masks of the chosen columns, basis vectors first, or None when
+        no such design exists in ``2**k`` runs (or the effort ran out
+        before it could be ruled out). Callers pass ``k <= n``; when
+        ``n < k`` the surplus base factors are simply left out, so the
+        design spans ``2**n`` runs rather than ``2**k``.
+    effort : int
+        Number of operations actually spent, so that a caller trying
+        several run sizes can keep the whole call bounded.
+    """
+    basis = [1 << i for i in range(k)]
+    if n <= k:
+        # A full factorial in the first n base factors: no defining word at
+        # all, so the resolution is unbounded.
+        return basis[:n], 0
+
+    # A candidate is rejected when it equals the sum of `depth` or fewer
+    # chosen columns, which is exactly what would create a word shorter
+    # than `res`. Only n - 1 columns are ever available to form such a sum.
+    depth = min(res - 2, n - 1)
+    # sums[j] holds the sums of exactly j chosen columns.
+    sums: list[set[int]] = [{0}] + [set() for _ in range(depth)]
+
+    def extend(column: int) -> list[tuple[int, set[int]]]:
+        record = []
+        for j in range(depth, 0, -1):
+            new = {column ^ s for s in sums[j - 1]} - sums[j]
+            if new:
+                sums[j] |= new
+                record.append((j, new))
+        return record
+
+    def undo(record: list[tuple[int, set[int]]]) -> None:
+        for j, new in record:
+            sums[j] -= new
+
+    chosen = list(basis)
+    for column in basis:
+        extend(column)
+
+    candidates = _candidate_columns(k)
+    trail: list[tuple[int, list[tuple[int, set[int]]]]] = []
+    index = 0
+    effort = 0
+
+    while True:
+        if len(chosen) == n:
+            return chosen, effort
+        if effort > effort_limit:
+            return None, effort
+
+        placed = False
+        last = len(candidates) - (n - len(chosen))
+        while index <= last:
+            column = candidates[index]
+            effort += 1
+            if any(column in sums[j] for j in range(1, depth + 1)):
+                index += 1
+                continue
+            # Extending costs one pass over the largest layer of sums.
+            effort += len(sums[depth - 1])
+            trail.append((index, extend(column)))
+            chosen.append(column)
+            index += 1
+            placed = True
+            break
+
+        if placed:
+            continue
+
+        if not trail:
+            return None, effort
+        # Resume the level below just past the column that was undone.
+        index, record = trail.pop()
+        undo(record)
+        chosen.pop()
+        index += 1
+
+
+def _generator_from_columns(columns: list[int], k: int) -> str:
+    """
+    Turn GF(2)**k column masks into a generator string for `fracfact`.
+
+    Parameters
+    ----------
+    columns : list of int
+        Bit masks of the design columns.
+    k : int
+        Number of base factors.
+
+    Returns
+    -------
+    str
+        A generator string such as ``"a b c ab ac bc abc"``.
+    """
+    names = string.ascii_lowercase
+    return " ".join(
+        "".join(names[i] for i in range(k) if column >> i & 1)
+        for column in columns
+    )
 
 
 ################################################################################
