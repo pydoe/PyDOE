@@ -28,11 +28,16 @@ import os
 import re
 import sys
 from pathlib import Path
+from typing import NoReturn
 
 import tomlkit
 
+
 PYPROJECT = Path("pyproject.toml")
-VERSION_CLASSIFIER = re.compile(r"^Programming Language :: Python :: (\d+\.\d+)$")
+GENERIC_CLASSIFIER = "Programming Language :: Python :: 3"
+VERSION_CLASSIFIER = re.compile(
+    r"^Programming Language :: Python :: (\d+\.\d+)$"
+)
 FLOOR = re.compile(r">=\s*(\d+\.\d+)")
 
 
@@ -47,12 +52,13 @@ def emit(name: str, value: str) -> None:
             handle.write(f"{name}={value}\n")
 
 
-def fail(message: str) -> None:
+def fail(message: str) -> NoReturn:
     print(f"::error::{message}", file=sys.stderr)
     raise SystemExit(1)
 
 
-def main() -> None:
+def active_versions() -> list[str]:
+    """Return the sorted active 3.x labels from ACTIVE_VERSIONS."""
     raw = os.environ.get("ACTIVE_VERSIONS", "").strip()
     if not raw:
         fail("ACTIVE_VERSIONS is unset")
@@ -64,9 +70,69 @@ def main() -> None:
 
     # endoflife.date also carries the 2.x tail on some products; only the
     # 3.x line is meaningful for a project that declares "3 :: Only".
-    active = sorted({v for v in labels if re.fullmatch(r"3\.\d+", str(v))}, key=key)
+    active = sorted(
+        {v for v in labels if re.fullmatch(r"3\.\d+", str(v))}, key=key
+    )
     if not active:
         fail("no active Python 3.x versions in ACTIVE_VERSIONS")
+    return active
+
+
+def rebuild_classifiers(
+    existing: list[str], positions: list[int], supported: list[str]
+) -> list[str]:
+    """Return `existing` with the per-version classifiers replaced."""
+    wanted = [f"Programming Language :: Python :: {v}" for v in supported]
+    if positions:
+        # Every version classifier sits at or after the first one, so the
+        # slice before it survives removal unshifted.
+        anchor = positions[0]
+        kept = [c for i, c in enumerate(existing) if i not in set(positions)]
+        return kept[:anchor] + wanted + kept[anchor:]
+
+    # No per-version entries yet: seed them after the generic
+    # "Programming Language :: Python :: 3" marker when there is one.
+    try:
+        anchor = existing.index(GENERIC_CLASSIFIER) + 1
+    except ValueError:
+        anchor = len(existing)
+    return existing[:anchor] + wanted + existing[anchor:]
+
+
+def summarize(
+    supported: list[str],
+    declared: list[str],
+    current_floor: str | None,
+    floor: str,
+) -> str:
+    """Render the pull request body describing the rewrite."""
+    added = [v for v in supported if v not in declared]
+    dropped = [v for v in declared if v not in supported]
+
+    lines = [
+        "The Python versions declared in `pyproject.toml` no longer match the",
+        "versions upstream supports, per [endoflife.date](https://endoflife.date/python).",
+        "",
+    ]
+    if added:
+        lines.append(f"- **Added:** {', '.join(added)}")
+    if dropped:
+        lines.append(f"- **Dropped (end-of-life):** {', '.join(dropped)}")
+    if current_floor != floor:
+        lines.append(
+            f"- **`requires-python`:** `>={current_floor}` -> `>={floor}`"
+        )
+    lines += [
+        "",
+        f"Declared set is now: {', '.join(supported)}.",
+        "",
+        "Opened automatically by the `Python Versions Sync` workflow.",
+    ]
+    return "\n".join(lines) + "\n"
+
+
+def main() -> None:
+    active = active_versions()
 
     if not PYPROJECT.is_file():
         fail("pyproject.toml not found")
@@ -83,7 +149,7 @@ def main() -> None:
     floor = max([f for f in (current_floor, active[0]) if f], key=key)
     supported = [v for v in active if key(v) >= key(floor)]
     if not supported:
-        fail(f"requires-python floor {current_floor} excludes every active version")
+        fail(f"requires-python floor {current_floor} excludes every version")
 
     # --- classifiers -----------------------------------------------------
     classifiers = project.get("classifiers")
@@ -91,34 +157,23 @@ def main() -> None:
         fail("[project] has no classifiers list")
 
     existing = [str(item) for item in classifiers]
-    positions = [i for i, item in enumerate(existing) if VERSION_CLASSIFIER.match(item)]
-    declared = [VERSION_CLASSIFIER.match(existing[i]).group(1) for i in positions]
+    positions = [
+        i for i, item in enumerate(existing) if VERSION_CLASSIFIER.match(item)
+    ]
+    declared = [
+        VERSION_CLASSIFIER.match(existing[i]).group(1) for i in positions
+    ]
 
     if declared == supported and current_floor == floor:
-        print(f"Already in sync: {', '.join(supported)} (requires-python >={floor})")
+        joined = ", ".join(supported)
+        print(f"Already in sync: {joined} (requires-python >={floor})")
         emit("changed", "false")
         return
 
-    wanted = [f"Programming Language :: Python :: {v}" for v in supported]
-    if positions:
-        # Every version classifier sits at or after the first one, so the
-        # slice before it survives removal unshifted.
-        anchor = positions[0]
-        kept = [c for i, c in enumerate(existing) if i not in set(positions)]
-        rebuilt = kept[:anchor] + wanted + kept[anchor:]
-    else:
-        # No per-version entries yet: seed them after the generic
-        # "Programming Language :: Python :: 3" marker when there is one.
-        try:
-            anchor = existing.index("Programming Language :: Python :: 3") + 1
-        except ValueError:
-            anchor = len(existing)
-        rebuilt = existing[:anchor] + wanted + existing[anchor:]
-
     array = tomlkit.array()
-    for item in rebuilt:
+    for item in rebuild_classifiers(existing, positions, supported):
         array.append(item)
-    array.multiline(True)
+    array.multiline(multiline=True)
     project["classifiers"] = array
 
     if current_floor != floor:
@@ -126,28 +181,7 @@ def main() -> None:
 
     PYPROJECT.write_text(tomlkit.dumps(document), encoding="utf-8")
 
-    added = [v for v in supported if v not in declared]
-    dropped = [v for v in declared if v not in supported]
-
-    lines = [
-        "The Python versions declared in `pyproject.toml` no longer match the",
-        "versions upstream supports, per [endoflife.date](https://endoflife.date/python).",
-        "",
-    ]
-    if added:
-        lines.append(f"- **Added:** {', '.join(added)}")
-    if dropped:
-        lines.append(f"- **Dropped (end-of-life):** {', '.join(dropped)}")
-    if current_floor != floor:
-        lines.append(f"- **`requires-python`:** `>={current_floor}` -> `>={floor}`")
-    lines += [
-        "",
-        f"Declared set is now: {', '.join(supported)}.",
-        "",
-        "Opened automatically by the `Python Versions Sync` workflow.",
-    ]
-    body = "\n".join(lines) + "\n"
-
+    body = summarize(supported, declared, current_floor, floor)
     body_file = os.environ.get("PR_BODY_FILE")
     if body_file:
         Path(body_file).write_text(body, encoding="utf-8")
