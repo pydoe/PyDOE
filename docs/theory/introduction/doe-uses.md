@@ -10,7 +10,7 @@ The preferred solution is to agree on a measurement by which competing choices c
 
 Sometimes this comparison is performed under one common set of conditions. This is a comparative study with a narrow scope - which is suitable for some initial comparisons of possible alternatives. Other comparison studies, intended to validate that one alternative is preferred over a wide range of conditions, will purposely and systematically vary the background conditions under which the primary comparison is made in order to reach a conclusion that will be proven valid over a broad scope. We discuss experimental designs for each of these types of comparisons in [Completely Randomized Designs](../choosing-design/completely-randomized.md) and [Randomized Block Designs](../choosing-design/randomized-block.md).
 
-## Selecting the Key Factors Affecting a Response ([Screening Experiments](../choosing-design/select-design.md#Screening))
+## Selecting the Key Factors Affecting a Response ([Screening Experiments](../choosing-design/select-design.md))
 
 Often there are many possible factors, some of which may be critical and others which may have little or no effect on a response. It may be desirable, as a goal by itself, to reduce the number of factors to a relatively small set (2-5) so that attention can be focussed on controlling those factors with appropriate specifications, control charts, etc.
 
